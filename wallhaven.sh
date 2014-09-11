@@ -8,6 +8,10 @@
 # This Script is written for GNU Linux, it should work under Mac OS
 #
 #
+# Revision 0.1.1
+# 1. updated and tested parts of the script to work with 
+#    newest wallhaven site (not all features tested)
+#
 # Revision 0.1
 # 1. first Version of script, most features from the wallbase 
 #    script are implemented
@@ -29,8 +33,8 @@ PASS=""
 #################################
 # Where should the Wallpapers be stored?
 LOCATION=/location/to/your/wallpaper/folder
-# How many Wallpapers should be downloaded, should be multiples of 24 (right now they only use a fixed number of thumbs per page)
-WPNUMBER=48
+# How many Wallpapers should be downloaded, should be multiples of 64 (right now they only use a fixed number of thumbs per page)
+WPNUMBER=64
 # Type standard (newest, oldest, random, hits, mostfav), search, favorites, useruploads
 TYPE=standard
 # From which Categories should Wallpapers be downloaded
@@ -103,12 +107,12 @@ function getPage {
 # arg1: the file containing the wallpapers
 #
 function downloadWallpapers {
-	URLSFORIMAGES="$(cat tmp | grep -o '<a href="http://alpha.wallhaven.cc/wallpaper/[0-9]*"' | sed  's .\{9\}  ')"
+	URLSFORIMAGES="$(cat tmp | grep -o '<a href="http://alpha.wallhaven.cc/wallpaper/[0-9]*"' | sed  's .\{25\}  ')"
 	for imgURL in $URLSFORIMAGES
-		do
-		img="$(echo $imgURL | sed 's/.\{1\}$//')"
-		number="$(echo $img | sed  's .\{36\}  ')"
-		if cat downloaded.txt | grep -w "$number" >/dev/null
+        do
+        img="$(echo $imgURL | sed 's/.\{1\}$//')"
+        number="$(echo $img | sed  's .\{36\}  ')"
+        if cat downloaded.txt | grep -w "$number" >/dev/null
 			then
 				printf "File already downloaded!\n"
 			else
@@ -116,11 +120,11 @@ function downloadWallpapers {
 				wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc $img
 				cat $number | egrep -o "http://alpha.wallhaven.cc/wallpapers.*(png|jpg|gif)" | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/$number -i -
 				rm $number	
-		fi
-		done
+        fi
+        done
         rm tmp
 } #/downloadWallpapers
- 
+
 # login only when it is required ( for example to download favourites or nsfw content... )
 if [ $PURITY == 001 ] || [ $PURITY == 011 ] || [ $PURITY == 111 ] ; then
    login $USER $PASS

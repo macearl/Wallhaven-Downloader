@@ -11,6 +11,10 @@
 # it installed
 #
 #
+# Revision 0.1.1
+# 1. updated and tested parts of the script to work with 
+#    newest wallhaven site (not all features tested)
+#
 # Revision 0.1
 # 1. first Version of script, most features from the wallbase 
 #    script are implemented
@@ -55,9 +59,9 @@ USR=AksumkA
 #################################
 ### End Configuration Options ###
 #################################
- 
+
 if [ ! -d $LOCATION ]; then
-	mkdir -p $LOCATION
+    mkdir -p $LOCATION
 fi
 
 cd $LOCATION
@@ -69,8 +73,8 @@ cd $LOCATION
 # arg2: password
 #
 function login {
-	# checking parameters -> if not ok print error and exit script
-	if [ $# -lt 2 ] || [ $1 == '' ] || [ $2 == '' ]; then
+    # checking parameters -> if not ok print error and exit script
+    if [ $# -lt 2 ] || [ $1 == '' ] || [ $2 == '' ]; then
         printf "Please check the needed Options for NSFW Content (username and password)\n\n"
         printf "For further Information see Section 13\n\n"
         printf "Press any key to exit\n"
@@ -88,32 +92,32 @@ function login {
 # downloads Page with Thumbnails 
 #
 function getPage {
-	# checking parameters -> if not ok print error and exit script
-	if [ $# -lt 1 ]; then
-		printf "getPage expects at least 1 argument\n"
-		printf "arg1:	 parameters for the wget -q command\n\n"
-		printf "press any key to exit\n"
-		read
-		exit
-	fi
+    # checking parameters -> if not ok print error and exit script
+    if [ $# -lt 1 ]; then
+        printf "getPage expects at least 1 argument\n"
+        printf "arg1:    parameters for the wget -q command\n\n"
+        printf "press any key to exit\n"
+        read
+        exit
+    fi
 
-	# parameters ok --> get page
-	wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc -O tmp "http://alpha.wallhaven.cc/$1"
+    # parameters ok --> get page
+    wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc -O tmp "http://alpha.wallhaven.cc/$1"
 } # /getPage
 
 #
 # downloads all the wallpapers from a wallpaperfile
-# arg1:	the file containing the wallpapers
+# arg1: the file containing the wallpapers
 #
 function downloadWallpapers {
-	URLSFORIMAGES="$(cat tmp | grep -o '<a href="http://alpha.wallhaven.cc/wallpaper/[0-9]*"' | sed  's .\{9\}  ')"
+    URLSFORIMAGES="$(cat tmp | grep -o '<a class="preview" href="http://alpha.wallhaven.cc/wallpaper/[0-9]*"' | sed  's .\{25\}  ')"
     for imgURL in $URLSFORIMAGES
         do
             img="$(echo $imgURL | sed 's/.\{1\}$//')"
             number="$(echo $img | sed  's .\{36\}  ')"
             if cat downloaded.txt | grep -w "$number" >/dev/null
             then
-                printf "File already downloaded!\n"
+                printf "\n File already downloaded!\n"
             else
                 echo $number >> downloaded.txt
                 echo $number >> download.txt
@@ -151,20 +155,20 @@ elif [ $TYPE == search ] ; then
         downloadWallpapers
         printf "    - done!\n"
     done
-	
+    
 elif [ $TYPE == favorites ] ; then
     # FAVORITES
     # currently using sum of all collections
     favnumber="$(wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/favorites -O - | grep -A 1 "<span>Favorites</span>" | grep -B 1 "<small>" | sed -n '2{p;q}' | sed 's/.\{9\}$//' | sed 's .\{23\}  ')"
     for (( count= 0, page=1; count< "$WPNUMBER" && count< "$favnumber"; count=count+"64", page=page+1 ));
-	do
-		printf "Download Page $page"
+    do
+        printf "Download Page $page"
         getPage "favorites?page=$page"
         printf "                    - done!\n"
         printf "Download Wallpapers from Page $page"
         downloadWallpapers
         printf "    - done!\n"
-	done
+    done
 
 elif [ $TYPE == useruploads ] ; then
     # UPLOADS FROM SPECIFIC USER
@@ -179,7 +183,7 @@ elif [ $TYPE == useruploads ] ; then
     done
 
 else
-	printf "error in TYPE please check Variable\n"
+    printf "error in TYPE please check Variable\n"
 fi
 
 rm -f cookies.txt login login.1
