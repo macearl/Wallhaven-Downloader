@@ -1,0 +1,22 @@
+Differences between normal version and parallel version.
+running on i7 2600k with 100mbit Internet connection
+---------------------------------------------------------
+19:37 $ time ./wallhaven_parallel.sh 
+Download Page 1                    - done!
+Download Wallpapers from Page 1    - done!
+Download Page 2                    - done!
+Download Wallpapers from Page 2    - done!
+
+real	0m56.460s
+user	0m3.363s
+sys	0m2.233s
+---------------------------------------------------------
+19:40 $ time ./wallhaven.sh 
+Download Page 1                    - done!
+Download Wallpapers from Page 1    - done!
+Download Page 2                    - done!
+Download Wallpapers from Page 2    - done!
+
+real	5m6.761s
+user	0m2.033s
+sys	0m2.303s
