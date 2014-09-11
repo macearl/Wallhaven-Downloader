@@ -52,7 +52,9 @@ ORDER=desc
 QUERY="nature"
 # User from which Wallpapers should be downloaded (only used for TYPE=useruploads)
 USR=AksumkA
-USR=AksumkA
+#################################
+### End Configuration Options ###
+#################################
  
 if [ ! -d $LOCATION ]; then
 	mkdir -p $LOCATION
