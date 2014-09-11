@@ -1,6 +1,6 @@
 <p>
-	This script downloads Wallpaper from <a href="alpha.wallhaven.cc">wallhaven.cc</a>, the script offers various filter options to download only wallpapers to your liking. <br/>
-	Right now <a href="alpha.wallhaven.cc">wallhaven.cc</a> is still in Alpha so dont expect too many updates until it hits at least Beta Status.
+	This script downloads Wallpaper from <a href="http://alpha.wallhaven.cc" target="_blank">wallhaven.cc</a>, the script offers various filter options to download only wallpapers to your liking. <br/>
+	Right now <a href="http://alpha.wallhaven.cc" target="_blank">wallhaven.cc</a> is still in Alpha so dont expect too many updates until it hits at least Beta Status.
 	<br/>
 	Also there are two Versions of the script one using gnuparallel and one that doesnt, see normal.vs.parallel.txt for comparison.<br />
 </p>
