@@ -1,31 +1,42 @@
 #!/bin/bash
 #
+# This script gets the beautiful wallpapers from http://wallhaven.cc
+# This script is brought to you by MacEarl and is based on the
+# script for wallbase.cc (https://github.com/sevensins/Wallbase-Downloader)
+#
+#
+# This Script is written for GNU Linux, it should work under Mac OS
+#
+#
+# Revision 0.1
+# 1. first Version of script, most features from the wallbase 
+#    script are implemented
+#
 ##################################
 ###    Needed for NSFW/New     ###
 ##################################
-
 # Enter your Username
 USER=""
 # Enter your password
 PASS=""
-
 #################################
 ###  End needed for NSFW      ###
 #################################
+
 
 #################################
 ###   Configuration Options   ###
 #################################
 # Where should the Wallpapers be stored?
 LOCATION=/location/to/your/wallpaper/folder
-# How many Wallpapers should be downloaded, should be multiples of 64 (right now they only use a fixed number of thumbs per page)
-WPNUMBER=64
+# How many Wallpapers should be downloaded, should be multiples of 24 (right now they only use a fixed number of thumbs per page)
+WPNUMBER=48
 # Type standard (newest, oldest, random, hits, mostfav), search, favorites, useruploads
 TYPE=standard
 # From which Categories should Wallpapers be downloaded
 CATEGORIES=111
 # Which Purity Wallpapers should be downloaded
-PURITY=111
+PURITY=110
 # Which Resolution should be downloaded, leave empty for all
 RESOLUTION=
 # Which aspectratio should be downloaded, leave empty for all
