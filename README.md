@@ -2,8 +2,6 @@
 	This script downloads Wallpaper from <a href="http://alpha.wallhaven.cc" target="_blank">wallhaven.cc</a>, the script offers various filter options to download only wallpapers to your liking.
 	<br/>
 	Right now <a href="http://alpha.wallhaven.cc" target="_blank">wallhaven.cc</a> is still in Alpha so dont expect too many updates until it hits at least Beta Status.
-	<br/>
-	Also there are two Versions of the script one using gnuparallel and one that doesnt, see normal.vs.parallel.txt for comparison.
 	<br />
 </p>
 
@@ -15,6 +13,16 @@
 <p>
 	<strong>Changelog :</strong>
 	<ul>
+		<li>
+			<strong>Revision 0.1.2</strong><br />
+			Contributed by MacEarl
+			<ol>
+				<li>fixed urls to work with latest wallhaven update</li>
+				<li>added some comments</li>
+				<li>fixed login issue when downloading favorites</li>
+				<li>merged normal and parallel version</li>
+			</ol>
+		</li>
 		<li>
 			<strong>Revision 0.1.1</strong><br />
 			Contributed by MacEarl
