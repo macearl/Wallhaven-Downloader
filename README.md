@@ -14,6 +14,18 @@
 	<strong>Changelog :</strong>
 	<ul>
 		<li>
+			<strong>Revision 0.1.3</strong><br />
+			Contributed by MacEarl
+			<ol>
+				<li>added check if downloaded.txt file exists</li>
+				<li>added "--gnu" option to parallel<br />
+				(for some older Distributions which set the default mode to tollef) <br />
+				For some older Versions of parallel remove the "--no-notice" option if you get an error like this: <br />
+				"parallel: Error: Command (--no-notice) starts with '-'. Is this a wrong option?"</li>
+				<li>fixed issue where wget would not automatically add a "http://" prefix</li>
+			</ol>
+		</li>
+		<li>
 			<strong>Revision 0.1.2</strong><br />
 			Contributed by MacEarl
 			<ol>

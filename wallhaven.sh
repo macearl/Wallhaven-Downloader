@@ -8,6 +8,14 @@
 # This Script is written for GNU Linux, it should work under Mac OS
 #
 #
+# Revision 0.1.3
+# 1. added check if downloaded.txt file exists
+# 2. added "--gnu" option to parallel 
+# (for some older Distributions which set the default mode to tollef)
+# For some older Versions of parallel remove the "--no-notice" option if you get an error like this:
+# "parallel: Error: Command (--no-notice) starts with '-'. Is this a wrong option?"
+# 3. fixed issue where wget would not automatically add a "http://" prefix 
+#
 # Revision 0.1.2
 # 1. fixed urls to work with latest wallhaven update
 # 2. added some comments
@@ -32,7 +40,6 @@ PASS=""
 #####################################
 ### End needed for NSFW/Favorites ###
 #####################################
-
 
 ####################################
 ###     Configuration Options    ###
@@ -64,12 +71,18 @@ PARALLEL=0
 ####################################
 ###   End Configuration Options  ###
 ####################################
- 
+
+# creates Location folder if it does not exist
 if [ ! -d $LOCATION ]; then
     mkdir -p $LOCATION
 fi
 
 cd $LOCATION
+
+# creates downloaded.txt if it does not exist
+if [ ! -f ./downloaded.txt ]; then
+    touch downloaded.txt
+fi
 
 #
 # logs in to the wallhaven website to give the user more functionality
@@ -121,8 +134,8 @@ function downloadWallpapers {
         img="$(echo $imgURL | sed 's/.\{1\}$//')"
         number="$(echo $img | sed  's .\{36\}  ')"
         if cat downloaded.txt | grep -w "$number" >/dev/null
-			then
-				printf "File already downloaded!\n"
+            then
+                printf "\nWallpaper $number already downloaded!"
         elif [ $PARALLEL == 1 ]
             then
                 echo $number >> downloaded.txt
@@ -130,15 +143,15 @@ function downloadWallpapers {
         else
                 echo $number >> downloaded.txt
 				  wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc $img
-                cat $number | egrep -o 'wallpapers.*(png|jpg|gif)' | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/$number -i -
+                cat $number | egrep -o 'wallpapers.*(png|jpg|gif)' | echo "http://$(cat -)" | wget --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/$number -i -
                 rm $number
             fi
         done
 
     if [ $PARALLEL == 1 ]
         then
-            cat download.txt | parallel --no-notice wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/wallpaper/{}
-            cat download.txt | parallel --no-notice "cat {} | egrep -o 'wallpapers.*(png|jpg|gif)' | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/{} -i -"
+            cat download.txt | parallel --gnu --no-notice wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/wallpaper/{}
+            cat download.txt | parallel --gnu --no-notice "cat {} | egrep -o 'wallpapers.*(png|jpg|gif)' | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/{} -i -"
             rm tmp $(cat download.txt) download.txt
         else
             rm tmp
@@ -155,10 +168,10 @@ if [ $TYPE == standard ]; then
     do
         printf "Download Page $page"
         getPage "search?page=$page&categories=$CATEGORIES&purity=$PURITY&resolutions=$RESOLUTION&ratios=$RATIO&sorting=$SORTING&order=$ORDER"
-        printf "                    - done!\n"
+        printf "\n    - done!\n"
         printf "Download Wallpapers from Page $page"
         downloadWallpapers
-        printf "    - done!\n"
+        printf "\n    - done!\n"
     done
 
 elif [ $TYPE == search ] ; then
@@ -167,10 +180,10 @@ elif [ $TYPE == search ] ; then
     do
         printf "Download Page $page"
         getPage "search?page=$page&categories=$CATEGORIES&purity=$PURITY&resolutions=$RESOLUTION&ratios=$RATIO&sorting=relevance&order=desc&q=$QUERY"
-        printf "                    - done!\n"
+        printf "\n    - done!\n"
         printf "Download Wallpapers from Page $page"
         downloadWallpapers
-        printf "    - done!\n"
+        printf "\n    - done!\n"
     done
     
 elif [ $TYPE == favorites ] ; then
@@ -181,10 +194,10 @@ elif [ $TYPE == favorites ] ; then
     do
         printf "Download Page $page"
         getPage "favorites?page=$page"
-        printf "                    - done!\n"
+        printf "\n    - done!\n"
         printf "Download Wallpapers from Page $page"
         downloadWallpapers
-        printf "    - done!\n"
+        printf "\n    - done!\n"
     done
 
 elif [ $TYPE == useruploads ] ; then
@@ -193,10 +206,10 @@ elif [ $TYPE == useruploads ] ; then
     do
         printf "Download Page $page"
         getPage "user/$USR/uploads?page=$page&purity=$PURITY"
-        printf "                    - done!\n"
+        printf "\n    - done!\n"
         printf "Download Wallpapers from Page $page"
         downloadWallpapers
-        printf "    - done!\n"
+        printf "\n    - done!\n"
     done
 
 else
