@@ -128,8 +128,8 @@ function getPage {
 # arg1: the file containing the wallpapers
 #
 function downloadWallpapers {
-	URLSFORIMAGES="$(cat tmp | grep -o '<a class="preview" href="http://alpha.wallhaven.cc/wallpaper/[0-9]*"' | sed  's .\{25\}  ')"
-	for imgURL in $URLSFORIMAGES
+    URLSFORIMAGES="$(cat tmp | grep -o '<a class="preview" href="http://alpha.wallhaven.cc/wallpaper/[0-9]*"' | sed  's .\{25\}  ')"
+    for imgURL in $URLSFORIMAGES
         do
         img="$(echo $imgURL | sed 's/.\{1\}$//')"
         number="$(echo $img | sed  's .\{36\}  ')"
@@ -142,8 +142,8 @@ function downloadWallpapers {
                 echo $number >> download.txt
         else
                 echo $number >> downloaded.txt
-				  wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc $img
-                cat $number | egrep -o 'wallpapers.*(png|jpg|gif)' | echo "http://$(cat -)" | wget --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/$number -i -
+                wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc $img
+                cat $number | egrep -o 'wallpapers.*(png|jpg|gif)' | echo "http://$(cat -)" | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/$number -i -
                 rm $number
             fi
         done
@@ -151,7 +151,7 @@ function downloadWallpapers {
     if [ $PARALLEL == 1 ]
         then
             cat download.txt | parallel --gnu --no-notice wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/wallpaper/{}
-            cat download.txt | parallel --gnu --no-notice "cat {} | egrep -o 'wallpapers.*(png|jpg|gif)' | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/{} -i -"
+            cat download.txt | parallel --gnu --no-notice "cat {} | egrep -o 'wallpapers.*(png|jpg|gif)' | echo "http://$(cat -)" | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/{} -i -"
             rm tmp $(cat download.txt) download.txt
         else
             rm tmp
