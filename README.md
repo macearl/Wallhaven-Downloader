@@ -14,6 +14,13 @@
 	<strong>Changelog :</strong>
 	<ul>
 		<li>
+			<strong>Revision 0.1.4</strong><br />
+			Contributed by MacEarl
+			<ol>
+				<li>fixed parallel mode</li>
+			</ol>
+		</li>
+		<li>
 			<strong>Revision 0.1.3</strong><br />
 			Contributed by MacEarl
 			<ol>

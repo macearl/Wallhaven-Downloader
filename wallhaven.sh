@@ -8,6 +8,9 @@
 # This Script is written for GNU Linux, it should work under Mac OS
 #
 #
+# Revision 0.1.4
+# 1. fixed parallel mode
+#
 # Revision 0.1.3
 # 1. added check if downloaded.txt file exists
 # 2. added "--gnu" option to parallel 
@@ -151,7 +154,7 @@ function downloadWallpapers {
     if [ $PARALLEL == 1 ]
         then
             cat download.txt | parallel --gnu --no-notice wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/wallpaper/{}
-            cat download.txt | parallel --gnu --no-notice "cat {} | egrep -o 'wallpapers.*(png|jpg|gif)' | echo "http://$(cat -)" | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/{} -i -"
+            cat download.txt | parallel --gnu --no-notice 'cat {} | echo "http://$(egrep -o "wallpapers.*(png|jpg|gif)")" | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/{} -i -'
             rm tmp $(cat download.txt) download.txt
         else
             rm tmp
