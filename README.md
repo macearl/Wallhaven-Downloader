@@ -14,6 +14,13 @@
 	<strong>Changelog :</strong>
 	<ul>
 		<li>
+			<strong>Revision 0.1.5</strong><br />
+			Contributed by MacEarl
+			<ol>
+				<li>fixed issue if all wallpapers on a page where already downloaded</li>
+			</ol>
+		</li>
+		<li>
 			<strong>Revision 0.1.4</strong><br />
 			Contributed by MacEarl
 			<ol>

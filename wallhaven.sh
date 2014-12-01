@@ -8,6 +8,9 @@
 # This Script is written for GNU Linux, it should work under Mac OS
 #
 #
+# Revision 0.1.5
+# 1. fixed issue if all wallpapers on a page where already downloaded
+#
 # Revision 0.1.4
 # 1. fixed parallel mode
 #
@@ -138,7 +141,7 @@ function downloadWallpapers {
         number="$(echo $img | sed  's .\{36\}  ')"
         if cat downloaded.txt | grep -w "$number" >/dev/null
             then
-                printf "\nWallpaper $number already downloaded!"
+                printf "\n    Wallpaper $number already downloaded!"
         elif [ $PARALLEL == 1 ]
             then
                 echo $number >> downloaded.txt
@@ -151,7 +154,7 @@ function downloadWallpapers {
             fi
         done
 
-    if [ $PARALLEL == 1 ]
+    if [ $PARALLEL == 1 -a -f ./download.txt ]
         then
             cat download.txt | parallel --gnu --no-notice wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/wallpaper/{}
             cat download.txt | parallel --gnu --no-notice 'cat {} | echo "http://$(egrep -o "wallpapers.*(png|jpg|gif)")" | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/{} -i -'
