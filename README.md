@@ -14,6 +14,14 @@
 	<strong>Changelog :</strong>
 	<ul>
 		<li>
+			<strong>Revision 0.1.6</strong><br />
+			Contributed by MacEarl
+			<ol>
+				<li>fixed issue with login token</li>
+				<li>added useragent to wget to fix "403 forbidden" error</li>
+			</ol>
+		</li>
+		<li>
 			<strong>Revision 0.1.5</strong><br />
 			Contributed by MacEarl
 			<ol>

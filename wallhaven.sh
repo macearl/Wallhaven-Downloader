@@ -107,9 +107,9 @@ function login {
     fi
     
     # everythings ok --> login
-    wget -q --keep-session-cookies --save-cookies=cookies.txt --referer=http://alpha.wallhaven.cc http://alpha.wallhaven.cc/auth/login
-    token="$(cat login | grep 'name="_token"' | sed  's .\{180\}  ' | sed 's/.\{16\}$//')"
-    wget -q --load-cookies=cookies.txt --keep-session-cookies --save-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/auth/login --post-data="_token=$token&username=$USER&password=$PASS" http://alpha.wallhaven.cc/auth/login
+    wget -q -U "Mozilla/5.0 (X11; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0" --keep-session-cookies --save-cookies=cookies.txt --referer=http://alpha.wallhaven.cc http://alpha.wallhaven.cc/auth/login
+    token="$(cat login | grep 'name="_token"' | sed 's:.*value="::' | sed 's/.\{2\}$//')"
+    wget -q -U "Mozilla/5.0 (X11; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0" --load-cookies=cookies.txt --keep-session-cookies --save-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/auth/login --post-data="_token=$token&username=$USER&password=$PASS" http://alpha.wallhaven.cc/auth/login
 } # /login
 
 # 
@@ -126,7 +126,7 @@ function getPage {
     fi
 
     # parameters ok --> get page
-    wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc -O tmp "http://alpha.wallhaven.cc/$1"
+    wget -q -U "Mozilla/5.0 (X11; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=alpha.wallhaven.cc -O tmp "http://alpha.wallhaven.cc/$1"
 } # /getPage
 
 #
@@ -148,16 +148,16 @@ function downloadWallpapers {
                 echo $number >> download.txt
         else
                 echo $number >> downloaded.txt
-                wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc $img
-                cat $number | egrep -o 'wallpapers.*(png|jpg|gif)' | echo "http://$(cat -)" | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/$number -i -
+                wget -q -U "Mozilla/5.0 (X11; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=alpha.wallhaven.cc $img
+                cat $number | egrep -o 'wallpapers.*(png|jpg|gif)' | echo "http://$(cat -)" | wget -q -U "Mozilla/5.0 (X11; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/$number -i -
                 rm $number
             fi
         done
 
     if [ $PARALLEL == 1 -a -f ./download.txt ]
         then
-            cat download.txt | parallel --gnu --no-notice wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/wallpaper/{}
-            cat download.txt | parallel --gnu --no-notice 'cat {} | echo "http://$(egrep -o "wallpapers.*(png|jpg|gif)")" | wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/{} -i -'
+            cat download.txt | parallel --gnu --no-notice 'wget -q -U "Mozilla/5.0 (X11; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/wallpaper/{}'
+            cat download.txt | parallel --gnu --no-notice 'cat {} | echo "http://$(egrep -o "wallpapers.*(png|jpg|gif)")" | wget -q -U "Mozilla/5.0 (X11; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0" --keep-session-cookies  --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/{} -i -'
             rm tmp $(cat download.txt) download.txt
         else
             rm tmp
@@ -195,7 +195,7 @@ elif [ $TYPE == search ] ; then
 elif [ $TYPE == favorites ] ; then
     # FAVORITES
     # currently using sum of all collections
-    favnumber="$(wget -q --keep-session-cookies --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/favorites -O - | grep -A 1 "<span>Favorites</span>" | grep -B 1 "<small>" | sed -n '2{p;q}' | sed 's/<[^>]\+>/ /g')"
+    favnumber="$(wget -q -U "Mozilla/5.0 (X11; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/favorites -O - | grep -A 1 "<span>Favorites</span>" | grep -B 1 "<small>" | sed -n '2{p;q}' | sed 's/<[^>]\+>/ /g')"
     for (( count=0, page=1; count< "$WPNUMBER" && count< "$favnumber"; count=count+64, page=page+1 ));
     do
         printf "Download Page $page"
