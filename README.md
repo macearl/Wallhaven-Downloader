@@ -14,6 +14,13 @@
 	<strong>Changelog :</strong>
 	<ul>
 		<li>
+			<strong>Revision 0.1.6.1</strong><br />
+			Contributed by MacEarl
+			<ol>
+				<li>added http prefix to referer</li>
+			</ol>
+		</li>
+		<li>
 			<strong>Revision 0.1.6</strong><br />
 			Contributed by MacEarl
 			<ol>

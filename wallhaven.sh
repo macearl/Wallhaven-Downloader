@@ -8,6 +8,9 @@
 # This Script is written for GNU Linux, it should work under Mac OS
 #
 #
+# Revision 0.1.6.1
+# 1. added http prefix to referer
+#
 # Revision 0.1.6
 # 1. fixed issue with login token
 # 2. added useragent to wget to fix "403 forbidden" error
@@ -130,7 +133,7 @@ function getPage {
     fi
 
     # parameters ok --> get page
-    wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=alpha.wallhaven.cc -O tmp "http://alpha.wallhaven.cc/$1"
+    wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc -O tmp "http://alpha.wallhaven.cc/$1"
 } # /getPage
 
 #
@@ -152,7 +155,7 @@ function downloadWallpapers {
                 echo $number >> download.txt
         else
                 echo $number >> downloaded.txt
-                wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=alpha.wallhaven.cc $img
+                wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc $img
                 cat $number | egrep -o 'wallpapers.*(png|jpg|gif)' | echo "http://$(cat -)" | wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/$number -i -
                 rm $number
             fi
@@ -160,7 +163,7 @@ function downloadWallpapers {
 
     if [ $PARALLEL == 1 -a -f ./download.txt ]
         then
-            cat download.txt | parallel --gnu --no-notice 'wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/wallpaper/{}'
+            cat download.txt | parallel --gnu --no-notice 'wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc http://alpha.wallhaven.cc/wallpaper/{}'
             cat download.txt | parallel --gnu --no-notice 'cat {} | echo "http://$(egrep -o "wallpapers.*(png|jpg|gif)")" | wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies  --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc/wallpaper/{} -i -'
             rm tmp $(cat download.txt) download.txt
         else
@@ -199,7 +202,7 @@ elif [ $TYPE == search ] ; then
 elif [ $TYPE == favorites ] ; then
     # FAVORITES
     # currently using sum of all collections
-    favnumber="$(wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=alpha.wallhaven.cc http://alpha.wallhaven.cc/favorites -O - | grep -A 1 "<span>Favorites</span>" | grep -B 1 "<small>" | sed -n '2{p;q}' | sed 's/<[^>]\+>/ /g')"
+    favnumber="$(wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc http://alpha.wallhaven.cc/favorites -O - | grep -A 1 "<span>Favorites</span>" | grep -B 1 "<small>" | sed -n '2{p;q}' | sed 's/<[^>]\+>/ /g')"
     for (( count=0, page=1; count< "$WPNUMBER" && count< "$favnumber"; count=count+64, page=page+1 ));
     do
         printf "Download Page $page"
