@@ -1,5 +1,5 @@
 <p>
-	This script downloads Wallpaper from <a href="http://alpha.wallhaven.cc" target="_blank">wallhaven.cc</a>, the script offers various filter options to download only wallpapers to your liking.
+	This script downloads wallpapers from <a href="http://alpha.wallhaven.cc" target="_blank">wallhaven.cc</a>, the script offers various filter options to download only wallpapers to your liking.
 	<br/>
 	Right now <a href="http://alpha.wallhaven.cc" target="_blank">wallhaven.cc</a> is still in Alpha so dont expect too many updates until it hits at least Beta Status.
 	<br />
@@ -15,14 +15,12 @@
 	<ul>
 		<li>
 			<strong>Revision 0.1.6.1</strong><br />
-			Contributed by MacEarl
 			<ol>
 				<li>added http prefix to referer</li>
 			</ol>
 		</li>
 		<li>
 			<strong>Revision 0.1.6</strong><br />
-			Contributed by MacEarl
 			<ol>
 				<li>fixed issue with login token</li>
 				<li>added useragent to wget to fix "403 forbidden" error</li>
@@ -30,21 +28,18 @@
 		</li>
 		<li>
 			<strong>Revision 0.1.5</strong><br />
-			Contributed by MacEarl
 			<ol>
 				<li>fixed issue if all wallpapers on a page where already downloaded</li>
 			</ol>
 		</li>
 		<li>
 			<strong>Revision 0.1.4</strong><br />
-			Contributed by MacEarl
 			<ol>
 				<li>fixed parallel mode</li>
 			</ol>
 		</li>
 		<li>
 			<strong>Revision 0.1.3</strong><br />
-			Contributed by MacEarl
 			<ol>
 				<li>added check if downloaded.txt file exists</li>
 				<li>added "--gnu" option to parallel<br />
@@ -56,7 +51,6 @@
 		</li>
 		<li>
 			<strong>Revision 0.1.2</strong><br />
-			Contributed by MacEarl
 			<ol>
 				<li>fixed urls to work with latest wallhaven update</li>
 				<li>added some comments</li>
@@ -66,14 +60,12 @@
 		</li>
 		<li>
 			<strong>Revision 0.1.1</strong><br />
-			Contributed by MacEarl
 			<ol>
 				<li>updated and tested parts of the script to work with newest wallhaven site (not all features tested)</li>
 			</ol>
 		</li>
 		<li>
 			<strong>Revision 0.1</strong><br />
-			Contributed by MacEarl
 			<ol>
 				<li>first Version of script, most features from the wallbase script are implemented</li>
 			</ol>
