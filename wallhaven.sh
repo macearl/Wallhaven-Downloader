@@ -8,6 +8,9 @@
 # This Script is written for GNU Linux, it should work under Mac OS
 #
 #
+# Revision 0.1.6.2
+# 1. sorting variable now affects search results, thanks to munhyunsu for pointing it out
+#
 # Revision 0.1.6.1
 # 1. added http prefix to referer
 #
