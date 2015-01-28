@@ -192,7 +192,7 @@ elif [ $TYPE == search ] ; then
     for (( count=0, page=1; count< "$WPNUMBER"; count=count+24, page=page+1 ));
     do
         printf "Download Page $page"
-        getPage "search?page=$page&categories=$CATEGORIES&purity=$PURITY&resolutions=$RESOLUTION&ratios=$RATIO&sorting=relevance&order=desc&q=$QUERY"
+        getPage "search?page=$page&categories=$CATEGORIES&purity=$PURITY&resolutions=$RESOLUTION&ratios=$RATIO&sorting=$SORTING&order=desc&q=$QUERY"
         printf "\n    - done!\n"
         printf "Download Wallpapers from Page $page"
         downloadWallpapers
