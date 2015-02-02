@@ -14,6 +14,12 @@
 	<strong>Changelog :</strong>
 	<ul>
 		<li>
+			<strong>Revision 0.1.6.3</strong><br />
+			<ol>
+				<li>added -m 1 option to grep command to prevent downloading every wallpaper twice</li>
+			</ol>
+		</li>
+		<li>
 			<strong>Revision 0.1.6.2</strong><br />
 			<ol>
 				<li>sorting variable now affects search results, thanks to munhyunsu for pointing it out</li>
