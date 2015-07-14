@@ -67,6 +67,8 @@ PASS=""
 LOCATION=/location/to/your/wallpaper/folder
 # How many Wallpapers should be downloaded, should be multiples of 24 (right now they only use a fixed number of thumbs per page)
 WPNUMBER=48
+# What page to start downloading at, default and minimum of 1.
+STARTPAGE=1
 # Type standard (newest, oldest, random, hits, mostfav), search, favorites (for now only the default collection), useruploads (if selected, only purity variable will change the outcome)
 TYPE=standard
 # From which Categories should Wallpapers be downloaded, first number is for General, second for Anime, third for People, 1 to enable category, 0 to disable it
@@ -183,7 +185,7 @@ if [ $PURITY == 001 ] || [ $PURITY == 011 ] || [ $PURITY == 111 ] || [ $TYPE == 
 fi
 
 if [ $TYPE == standard ]; then
-    for (( count=0, page=1; count< "$WPNUMBER"; count=count+24, page=page+1 ));
+    for (( count=0, page="$STARTPAGE"; count< "$WPNUMBER"; count=count+24, page=page+1 ));
     do
         printf "Download Page $page"
         getPage "search?page=$page&categories=$CATEGORIES&purity=$PURITY&resolutions=$RESOLUTION&ratios=$RATIO&sorting=$SORTING&order=$ORDER"
@@ -195,7 +197,7 @@ if [ $TYPE == standard ]; then
 
 elif [ $TYPE == search ] ; then
     # SEARCH
-    for (( count=0, page=1; count< "$WPNUMBER"; count=count+24, page=page+1 ));
+    for (( count=0, page="$STARTPAGE"; count< "$WPNUMBER"; count=count+24, page=page+1 ));
     do
         printf "Download Page $page"
         getPage "search?page=$page&categories=$CATEGORIES&purity=$PURITY&resolutions=$RESOLUTION&ratios=$RATIO&sorting=$SORTING&order=desc&q=$QUERY"
@@ -209,7 +211,7 @@ elif [ $TYPE == favorites ] ; then
     # FAVORITES
     # currently using sum of all collections
     favnumber="$(wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=http://alpha.wallhaven.cc http://alpha.wallhaven.cc/favorites -O - | grep -A 1 "<span>Favorites</span>" | grep -B 1 "<small>" | sed -n '2{p;q}' | sed 's/<[^>]\+>/ /g')"
-    for (( count=0, page=1; count< "$WPNUMBER" && count< "$favnumber"; count=count+64, page=page+1 ));
+    for (( count=0, page="$STARTPAGE"; count< "$WPNUMBER" && count< "$favnumber"; count=count+64, page=page+1 ));
     do
         printf "Download Page $page"
         getPage "favorites?page=$page"
@@ -221,7 +223,7 @@ elif [ $TYPE == favorites ] ; then
 
 elif [ $TYPE == useruploads ] ; then
     # UPLOADS FROM SPECIFIC USER
-    for (( count=0, page=1; count< "$WPNUMBER"; count=count+24, page=page+1 ));
+    for (( count=0, page="$STARTPAGE"; count< "$WPNUMBER"; count=count+24, page=page+1 ));
     do
         printf "Download Page $page"
         getPage "user/$USR/uploads?page=$page&purity=$PURITY"
