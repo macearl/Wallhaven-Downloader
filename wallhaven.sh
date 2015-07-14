@@ -8,6 +8,9 @@
 # This Script is written for GNU Linux, it should work under Mac OS
 #
 #
+# Revision 0.1.6.4
+# 1. added a starting page number (by ry167)
+#
 # Revision 0.1.6.3
 # 1. added -m 1 option to grep command to prevent downloading every wallpaper twice
 # 

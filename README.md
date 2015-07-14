@@ -12,7 +12,13 @@
 
 <p>
 	<strong>Changelog :</strong>
-	<ul>
+	<ul># Revision 0.1.6.4
+		<li>
+			<strong>Revision 0.1.6.4</strong><br />
+			<ol>
+				<li>added a starting page number (by ry167)</li>
+			</ol>
+		</li>
 		<li>
 			<strong>Revision 0.1.6.3</strong><br />
 			<ol>
