@@ -12,7 +12,7 @@
 
 <p>
 	<strong>Changelog :</strong>
-	<ul># Revision 0.1.6.4
+	<ul>
 		<li>
 			<strong>Revision 0.1.6.4</strong><br />
 			<ol>
