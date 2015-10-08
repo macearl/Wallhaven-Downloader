@@ -32,19 +32,19 @@ STARTPAGE=1
 TYPE=standard
 # From which Categories should Wallpapers be downloaded, first number is for General, second for Anime, third for People, 1 to enable category, 0 to disable it
 CATEGORIES=111
-# Which Wallpapers should be filtered (FILTER) downloaded, first number is for sfw content, second for sketchy content, third for nsfw, 1 to enable, 0 to disable
+# filter wallpapers before downloading, first number is for sfw content, second for sketchy content, third for nsfw content, 1 to enable, 0 to disable
 FILTER=110
-# Which Resolution should be downloaded, leave empty for all (most common resolutions possible, for details see wallhaven site)
+# Which Resolutions should be downloaded, leave empty for all (most common resolutions possible, for details see wallhaven site), separate multiple resolutions with , eg. 1920x1080,1920x1200
 RESOLUTION=
-# Which aspectASPECTRATIO should be downloaded, leave empty for all (possible values: 4x3, 5x4, 16x9, 16x10, 32x9, 48x9)
+# Which aspectratios should be downloaded, leave empty for all (possible values: 4x3, 5x4, 16x9, 16x10, 32x9, 48x9), separate mutliple ratios with , eg. 4x3,16x9
 ASPECTRATIO=
 # Which Type should be displayed (relevance, random, date_added, views, favorites)
 MODE=random
-# How should the Wallpapers be ordered (desc, asc)
+# How should the wallpapers be ordered (desc, asc)
 ORDER=desc
 # Searchterm, only used if TYPE = search
 QUERY="nature"
-# User from which Wallpapers should be downloaded (only used for TYPE=useruploads)
+# User from which wallpapers should be downloaded (only used for TYPE=useruploads)
 USER=AksumkA
 # use gnu parallel to speed up the download (0, 1), if set to 1 make sure you have gnuparallel installed, see normal.vs.parallel.txt for speed improvements
 PARALLEL=0
@@ -92,7 +92,7 @@ function getPage {
 } # /getPage
 
 #
-# downloads all the wallpapers from a wallpaperfile
+# downloads all the wallpaper from a wallpaperfile
 # arg1: the file containing the wallpapers
 #
 function downloadWallpapers {
