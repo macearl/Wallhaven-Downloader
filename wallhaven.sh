@@ -45,7 +45,7 @@ ORDER=desc
 # Searchterm, only used if TYPE = search
 QUERY="nature"
 # User from which wallpapers should be downloaded (only used for TYPE=useruploads)
-USER=AksumkA
+USR=AksumkA
 # use gnu parallel to speed up the download (0, 1), if set to 1 make sure you have gnuparallel installed, see normal.vs.parallel.txt for speed improvements
 PARALLEL=0
 #####################################
@@ -196,7 +196,7 @@ while [[ $# -ge 1 ]]
             QUERY=$(echo "$2" | sed s/\'//g)
             shift;;
         -u|--user)
-            USER="$2"
+            USR="$2"
             shift;;
         -p|--parallel)
             PARALLEL="$2"
@@ -277,7 +277,7 @@ elif [ $TYPE == useruploads ] ; then
     for (( count=0, page="$STARTPAGE"; count< "$WPNUMBER"; count=count+24, page=page+1 ));
     do
         printf "Download Page $page"
-        getPage "user/$USER/uploads?page=$page&purity=$FILTER"
+        getPage "user/$USR/uploads?page=$page&purity=$FILTER"
         printf "\n    - done!\n"
         printf "Download Wallpapers from Page $page"
         downloadWallpapers
