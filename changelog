@@ -1,4 +1,7 @@
 Changelog
+ Revision 0.1.6.6
+ 1. fixed issue with downloading favorites
+
  Revision 0.1.6.5
  1. added command line options/switches (-l / --location, ...)
  2. added help text
