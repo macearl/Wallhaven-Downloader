@@ -1,4 +1,7 @@
 Changelog
+ Revision 0.1.6.7
+ 1. replaced http with https
+
  Revision 0.1.6.6
  1. fixed issue with downloading favorites
 
@@ -12,7 +15,7 @@ Changelog
 
  Revision 0.1.6.3
  1. added -m 1 option to grep command to prevent downloading every wallpaper twice
- 
+
  Revision 0.1.6.2
  1. MODE variable now affects search results, thanks to munhyunsu for pointing it out
 
@@ -31,22 +34,22 @@ Changelog
 
  Revision 0.1.3
  1. added check if downloaded.txt file exists
- 2. added "--gnu" option to parallel 
+ 2. added "--gnu" option to parallel
  	(for some older Distributions which set the default mode to tollef)
  	For some older Versions of parallel remove the "--no-notice" option if you get an error like this:
  	"parallel: Error: Command (--no-notice) starts with '-'. Is this a wrong option?"
- 3. fixed issue where wget would not automatically add a "http://" prefix 
+ 3. fixed issue where wget would not automatically add a "http://" prefix
 
  Revision 0.1.2
  1. fixed urls to work with latest wallhaven update
  2. added some comments
  3. fixed login issue when downloading favorites
  4. merged normal and parallel version
- 
+
  Revision 0.1.1
- 1. updated and tested parts of the script to work with 
+ 1. updated and tested parts of the script to work with
     newest wallhaven site (not all features tested)
 
  Revision 0.1
- 1. first Version of script, most features from the wallbase 
+ 1. first Version of script, most features from the wallbase
     script are implemented
