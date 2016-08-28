@@ -1,7 +1,10 @@
 Changelog
+ Revision 0.1.6.8
+ 1. quickfix to make downloading possible again (rather ugly)
+
  Revision 0.1.6.7
  1. replaced http with https
-
+ 
  Revision 0.1.6.6
  1. fixed issue with downloading favorites
 
