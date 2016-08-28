@@ -111,7 +111,7 @@ function downloadWallpapers {
         else
                 echo $number >> downloaded.txt
                 wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc $img
-                cat $number | echo $"http:$(egrep -m 1 -o $'content="//wallpapers.[[:print:]]*(png|jpg|gif)"[/>[:space:]]*<link' | sed  's .\{9\}  ')" | cut -f1 -d'"' | wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc/wallpaper/$number -i -
+                cat $number | echo "https:$(egrep -m 1 -o 'content="//wallpapers.[[:print:]]*(png|jpg|gif)"[/>[:space:]]*<link' | sed  's .\{9\}  ')" | cut -f1 -d\" | wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc/wallpaper/$number -i -
                 rm $number
             fi
         done
@@ -119,8 +119,7 @@ function downloadWallpapers {
     if [ $PARALLEL == 1 -a -f ./download.txt ]
         then
             cat download.txt | parallel --gnu --no-notice 'wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc https://alpha.wallhaven.cc/wallpaper/{}'
-            #cat download.txt | parallel --gnu --no-notice 'cat {} | echo $"http:$(egrep -m 1 -o $'content="//wallpapers.[[:print:]]*(png|jpg|gif)"[/>[:space:]]*<link' | sed  's .\{9\}  ')" | cut -f1 -d\" | wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies  --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc/wallpaper/{} -i -'
-            cat download.txt | parallel --gnu --no-notice 'cat {} | echo $"http:$(egrep -m 1 -o '"'"'content="//wallpapers.[[:print:]]*(png|jpg|gif)"[/>[:space:]]*<link'"'"' | sed  '"'"'s .\{9\}  '"'"')" | cut -f1 -d\" | wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies  --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc/wallpaper/{} -i -'
+            cat download.txt | parallel --gnu --no-notice 'cat {} | echo $"https:$(egrep -m 1 -o '"'"'content="//wallpapers.[[:print:]]*(png|jpg|gif)"[/>[:space:]]*<link'"'"' | sed  '"'"'s .\{9\}  '"'"')" | cut -f1 -d\" | wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies  --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc/wallpaper/{} -i -'
             rm tmp $(cat download.txt) download.txt
         else
             rm tmp
