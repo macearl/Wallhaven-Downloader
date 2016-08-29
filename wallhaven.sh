@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.1.6.8
+REVISION=0.1.6.9
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -60,18 +60,18 @@ PARALLEL=0
 #
 function login {
     # checking parameters -> if not ok print error and exit script
-    if [ $# -lt 2 ] || [ $1 == '' ] || [ $2 == '' ]; then
+    if [ $# -lt 2 ] || [ "$1" == '' ] || [ "$2" == '' ]; then
         printf "Please check the needed Options for NSFW Content (username and password)\n\n"
         printf "For further Information see Section 13\n\n"
         printf "Press any key to exit\n"
-        read
+        read -r
         exit
     fi
 
     # everythings ok --> login
-    wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --referer=https://alpha.wallhaven.cc https://alpha.wallhaven.cc/auth/login
-    token="$(cat login | grep 'name="_token"' | sed 's:.*value="::' | sed 's/.\{2\}$//')"
-    wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --load-cookies=cookies.txt --keep-session-cookies --save-cookies=cookies.txt --referer=https://alpha.wallhaven.cc/auth/login --post-data="_token=$token&username=$USER&password=$PASS" https://alpha.wallhaven.cc/auth/login
+    WGET --referer=https://alpha.wallhaven.cc https://alpha.wallhaven.cc/auth/login
+    token="$(grep 'name="_token"' login | sed 's:.*value="::' | sed 's/.\{2\}$//')"
+    WGET --referer=https://alpha.wallhaven.cc/auth/login --post-data="_token=$token&username=$USER&password=$PASS" https://alpha.wallhaven.cc/auth/login
 } # /login
 
 #
@@ -83,12 +83,12 @@ function getPage {
         printf "getPage expects at least 1 argument\n"
         printf "arg1:    parameters for the wget -q command\n\n"
         printf "press any key to exit\n"
-        read
+        read -r
         exit
     fi
 
     # parameters ok --> get page
-    wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc -O tmp "https://alpha.wallhaven.cc/$1"
+    WGET --referer=https://alpha.wallhaven.cc -O tmp "https://alpha.wallhaven.cc/$1"
 } # /getPage
 
 #
@@ -96,35 +96,63 @@ function getPage {
 # arg1: the file containing the wallpapers
 #
 function downloadWallpapers {
-    URLSFORIMAGES="$(cat tmp | grep -o '<a class="preview" href="https://alpha.wallhaven.cc/wallpaper/[0-9]*"' | sed  's .\{25\}  ')"
+    URLSFORIMAGES="$(grep -o '<a class="preview" href="https://alpha.wallhaven.cc/wallpaper/[0-9]*"' tmp)"
+
+    OIFS="$IFS"
+    IFS=$'\n'
+
     for imgURL in $URLSFORIMAGES
         do
-        img="$(echo $imgURL | sed 's/.\{1\}$//')"
-        number="$(echo $img | sed  's .\{37\}  ')"
-        if cat downloaded.txt | grep -w "$number" >/dev/null
+        img="${imgURL: 25 : -1}"
+        number="${img##*/}"
+
+        if grep -w "$number" downloaded.txt >/dev/null
             then
-                printf "\n    Wallpaper $number already downloaded!"
+                printf "\n    Wallpaper %s already downloaded!" "$number"
         elif [ $PARALLEL == 1 ]
             then
-                echo $number >> downloaded.txt
-                echo $number >> download.txt
+                echo "$number" >> downloaded.txt
+                echo "$number" >> download.txt
         else
-                echo $number >> downloaded.txt
-                wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc $img
-                cat $number | echo "https:$(egrep -m 1 -o 'content="//wallpapers.[[:print:]]*(png|jpg|gif)"[/>[:space:]]*<link' | sed  's .\{9\}  ')" | cut -f1 -d\" | wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc/wallpaper/$number -i -
-                rm $number
-            fi
+                echo "$number" >> downloaded.txt
+                WGET --referer=https://alpha.wallhaven.cc "$img"
+                echo "https:$(egrep -m 1 -o "src=\"//wallpapers.*(png|jpg|gif)" "$number" | cut -b 6-)" | WGET --referer=https://alpha.wallhaven.cc/wallpaper/"$number" -i -
+                rm "$number"
+        fi
         done
 
-    if [ $PARALLEL == 1 -a -f ./download.txt ]
+    IFS="$OIFS"
+
+    if [ $PARALLEL == 1 ] && [ -f ./download.txt ]
         then
-            cat download.txt | parallel --gnu --no-notice 'wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc https://alpha.wallhaven.cc/wallpaper/{}'
-            cat download.txt | parallel --gnu --no-notice 'cat {} | echo $"https:$(egrep -m 1 -o '"'"'content="//wallpapers.[[:print:]]*(png|jpg|gif)"[/>[:space:]]*<link'"'"' | sed  '"'"'s .\{9\}  '"'"')" | cut -f1 -d\" | wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies  --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc/wallpaper/{} -i -'
+            # export wget wrapper to make it available for parallel
+            export -f WGET
+            SHELL=$(type -p bash) parallel --gnu --no-notice 'WGET --referer=https://alpha.wallhaven.cc https://alpha.wallhaven.cc/wallpaper/{}' < download.txt
+            SHELL=$(type -p bash) parallel --gnu --no-notice 'cat {} | echo "https:$(egrep -m 1 -o "src=\"//wallpapers.*(png|jpg|gif)" | cut -b 6-)" | WGET --referer=https://alpha.wallhaven.cc/wallpaper/{} -i -' < download.txt
             rm tmp $(cat download.txt) download.txt
         else
             rm tmp
-        fi
+    fi
 } #/downloadWallpapers
+
+#
+# wrapper for wget with some default arguments
+# arg0: additional arguments for wget (optional)
+# arg1: file to download
+#
+function WGET {
+    # checking parameters -> if not ok print error and exit script
+    if [ $# -lt 1 ]; then
+        printf "WGET expects at least 1 argument\n"
+        printf "arg0:    additional arguments for wget (optional)\n"
+        printf "arg1:    file to download\n\n"
+        printf "press any key to exit\n"
+        read -r
+        exit
+    fi
+    # default wget command
+    wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt "$@"
+}
 
 #
 # displays help text (valid command line arguments)
@@ -193,7 +221,7 @@ while [[ $# -ge 1 ]]
             ORDER="$2"
             shift;;
         -q|--query)
-            QUERY=$(echo "$2" | sed s/\'//g)
+            QUERY=${2//\'/}
             shift;;
         -u|--user)
             USR="$2"
@@ -206,11 +234,11 @@ while [[ $# -ge 1 ]]
             exit
             ;;
         -v|--version)
-            printf "Wallhaven Downloader $REVISION"
+            printf "Wallhaven Downloader %s" "$REVISION"
             exit
             ;;
         *)
-            printf "unknown option: $1\n"
+            printf "unknown option: %s\n" "$1"
             helpText
             exit
             ;;
@@ -219,11 +247,11 @@ while [[ $# -ge 1 ]]
     done
 
 # creates Location folder if it does not exist
-if [ ! -d $LOCATION ]; then
-    mkdir -p $LOCATION
+if [ ! -d "$LOCATION" ]; then
+    mkdir -p "$LOCATION"
 fi
 
-cd $LOCATION
+cd "$LOCATION" || exit
 
 # creates downloaded.txt if it does not exist
 if [ ! -f ./downloaded.txt ]; then
@@ -231,55 +259,55 @@ if [ ! -f ./downloaded.txt ]; then
 fi
 
 # login only when it is required ( for example to download favourites or nsfw content... )
-if [ $FILTER == 001 ] || [ $FILTER == 011 ] || [ $FILTER == 111 ] || [ $TYPE == favorites ] ; then
-   login $USER $PASS
+if [ "$FILTER" == 001 ] || [ "$FILTER" == 011 ] || [ "$FILTER" == 111 ] || [ "$TYPE" == favorites ] ; then
+   login "$USER" "$PASS"
 fi
 
-if [ $TYPE == standard ]; then
+if [ "$TYPE" == standard ]; then
     for (( count=0, page="$STARTPAGE"; count< "$WPNUMBER"; count=count+24, page=page+1 ));
     do
-        printf "Download Page $page"
+        printf "Download Page %s" "$page"
         getPage "search?page=$page&categories=$CATEGORIES&purity=$FILTER&resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE&order=$ORDER"
         printf "\n    - done!\n"
-        printf "Download Wallpapers from Page $page"
+        printf "Download Wallpapers from Page %s" "$page"
         downloadWallpapers
         printf "\n    - done!\n"
     done
 
-elif [ $TYPE == search ] ; then
+elif [ "$TYPE" == search ] ; then
     # SEARCH
     for (( count=0, page="$STARTPAGE"; count< "$WPNUMBER"; count=count+24, page=page+1 ));
     do
-        printf "Download Page $page"
+        printf "Download Page %s" "$page"
         getPage "search?page=$page&categories=$CATEGORIES&purity=$FILTER&resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE&order=desc&q=$QUERY"
         printf "\n    - done!\n"
-        printf "Download Wallpapers from Page $page"
+        printf "Download Wallpapers from Page %s" "$page"
         downloadWallpapers
         printf "\n    - done!\n"
     done
 
-elif [ $TYPE == favorites ] ; then
+elif [ "$TYPE" == favorites ] ; then
     # FAVORITES
     # currently using sum of all collections
-    favnumber="$(wget -q -U "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.99 Safari/537.36" --keep-session-cookies --save-cookies=cookies.txt --load-cookies=cookies.txt --referer=https://alpha.wallhaven.cc https://alpha.wallhaven.cc/favorites -O - | grep -A 25 "<ul class=\"blocklist collections-list\" data-target=\"https://alpha.wallhaven.cc/favorites/move\">" | grep -B 1 "<small>" | sed -n '2{p;q}' | sed 's/<[^>]\+>/ /g' | sed  's .\{3\}  ' | sed 's/.\{1\}$//')"
+    favnumber="$(WGET --referer=https://alpha.wallhaven.cc https://alpha.wallhaven.cc/favorites -O - | grep -A 25 "<ul class=\"blocklist collections-list\" data-target=\"https://alpha.wallhaven.cc/favorites/move\">" | grep -B 1 "<small>" | sed -n '2{p;q}' | sed 's/<[^>]\+>/ /g' | sed  's .\{3\}  ' | sed 's/.\{1\}$//')"
     for (( count=0, page="$STARTPAGE"; count< "$WPNUMBER" && count< "$favnumber"; count=count+24, page=page+1 ));
     do
-        printf "Download Page $page"
+        printf "Download Page %s" "$page"
         getPage "favorites?page=$page"
         printf "\n    - done!\n"
-        printf "Download Wallpapers from Page $page"
+        printf "Download Wallpapers from Page %s" "$page"
         downloadWallpapers
         printf "\n    - done!\n"
     done
 
-elif [ $TYPE == useruploads ] ; then
+elif [ "$TYPE" == useruploads ] ; then
     # UPLOADS FROM SPECIFIC USER
     for (( count=0, page="$STARTPAGE"; count< "$WPNUMBER"; count=count+24, page=page+1 ));
     do
-        printf "Download Page $page"
+        printf "Download Page %s" "$page"
         getPage "user/$USR/uploads?page=$page&purity=$FILTER"
         printf "\n    - done!\n"
-        printf "Download Wallpapers from Page $page"
+        printf "Download Wallpapers from Page %s" "$page"
         downloadWallpapers
         printf "\n    - done!\n"
     done
