@@ -1,4 +1,7 @@
 Changelog
+ Revision 0.1.6.10
+ 1. removed substring with negative length for backwards compatibility
+
  Revision 0.1.6.9
  1. some refactoring
 

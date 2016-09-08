@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.1.6.9
+REVISION=0.1.6.10
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -103,8 +103,11 @@ function downloadWallpapers {
 
     for imgURL in $URLSFORIMAGES
         do
-        img="${imgURL: 25 : -1}"
-        number="${img##*/}"
+        # does not work for bash < 4.2
+        #img="${imgURL: 25 : -1}"
+        #number="${img##*/}"
+        img="$(echo $imgURL | sed  's .\{25\}  ' | sed 's/.\{1\}$//')"
+        number="$(echo $img | sed  's .\{37\}  ')"
 
         if grep -w "$number" downloaded.txt >/dev/null
             then
