@@ -1,4 +1,11 @@
 Changelog
+ Revision 0.1.7
+ 1. fixed Favorites download
+ 2. get wallpaper URL from thumbnail page
+ 	no need to download every wallpaper page anymore
+ 3. added custom Thumbnail per Page option
+ 4. refactoring
+
  Revision 0.1.6.10
  1. removed substring with negative length for backwards compatibility
 
