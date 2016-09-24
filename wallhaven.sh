@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.1.7
+REVISION=0.1.7.1
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -56,6 +56,9 @@ MODE=random
 ORDER=desc
 # Searchterm, only used if TYPE = search
 QUERY="nature"
+# Should the search results be saved to a separate subfolder?
+# 0 for no separate folder, 1 for separate subfolder
+SUBFOLDER=0
 # User from which wallpapers should be downloaded (only used for
 # TYPE=useruploads)
 USR=AksumkA
@@ -320,6 +323,14 @@ while [[ $# -ge 1 ]]
     esac
     shift # past argument or value
     done
+
+# optionally create a separate subfolder for each search query
+# might download duplicates as each search query has its own list of
+# downloaded wallpapers
+if [ "$TYPE" == search ] && [ "$SUBFOLDER" == 1 ]
+then
+    LOCATION+=/$(echo "$QUERY" | sed -e "s/ /_/g" -e "s/+/_/g" -e  "s/\///g")
+fi
 
 # creates Location folder if it does not exist
 if [ ! -d "$LOCATION" ]
