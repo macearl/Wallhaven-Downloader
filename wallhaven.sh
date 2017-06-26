@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.1.7.1
+REVISION=0.1.7.2
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -14,6 +14,8 @@ REVISION=0.1.7.1
 # Enter your Username
 USER=""
 # Enter your password
+# if your password contains ' you need to escape it
+# replace all ' with '"'"'
 PASS=""
 #####################################
 ### End needed for NSFW/Favorites ###
@@ -99,8 +101,10 @@ function login {
         https://alpha.wallhaven.cc/auth/login
     token="$(grep 'name="_token"' login | sed 's:.*value="::' \
         | sed 's/.\{2\}$//')"
+    # source: https://stackoverflow.com/a/17989856
+    encoded_pass=$(echo -n "$PASS" | od -An -tx1 | tr ' ' % | xargs printf "%s" )
     WGET --referer=https://alpha.wallhaven.cc/auth/login \
-        --post-data="_token=$token&username=$USER&password=$PASS" \
+        --post-data="_token=$token&username=$USER&password=$encoded_pass" \
         https://alpha.wallhaven.cc/auth/login
 } # /login
 
@@ -145,8 +149,8 @@ function downloadWallpapers {
                 echo "$imgURL" >> download.txt
             else
                 echo "$imgURL" >> downloaded.txt
-                downloadWallpaper $imgURL
-        fi
+                downloadWallpaper "$imgURL"
+            fi
         done
 
     IFS="$OIFS"
@@ -176,11 +180,11 @@ function downloadWallpaper {
     # if the last case occurs to you please report the id back to me,
     # so that i can add the missing extension
     ! WGET --referer=https://alpha.wallhaven.cc/wallpaper/"$1" \
-        https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-$1.jpg &&
+        https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-"$1".jpg &&
     ! WGET --referer=https://alpha.wallhaven.cc/wallpaper/"$1" \
-        https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-$1.png &&
+        https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-"$1".png &&
     ! WGET --referer=https://alpha.wallhaven.cc/wallpaper/"$1" \
-        https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-$1.gif &&
+        https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-"$1".gif &&
     printf "Could not determine file extension for id: %s\n" "$1"
 }
 
@@ -351,7 +355,7 @@ fi
 if  [ "$FILTER" == 001 ] || [ "$FILTER" == 011 ] || [ "$FILTER" == 111 ] \
     || [ "$TYPE" == favorites ] || [ "$THUMBS" != 24 ]
 then
-        login "$USER" "$PASS"
+    login "$USER" "$PASS"
 fi
 
 if [ "$TYPE" == standard ]
@@ -394,9 +398,9 @@ then
     # FAVORITES
     # currently only using default collection
     favnumber="$(WGET --referer=https://alpha.wallhaven.cc \
-                 https://alpha.wallhaven.cc/favorites -O - | \
-                 grep -o "<small>[0-9]*</small>Default" | \
-                 sed  's .\{7\}  ' | sed 's/.\{15\}$//')"
+                https://alpha.wallhaven.cc/favorites -O - | \
+                grep -o "<small>[0-9]*</small>Default" | \
+                sed  's .\{7\}  ' | sed 's/.\{15\}$//')"
 
     for ((  count=0, page="$STARTPAGE";
             count< "$WPNUMBER" && count< "$favnumber";
