@@ -89,8 +89,8 @@ function login {
     then
         printf "Please make sure to enter valid login credentials,\n"
         printf "they are needed for NSFW Content and downloading \n"
-        printf "your Favorites also make sure your Thumbnails per\nPage"
-        printf " Setting matches the THUMBS Variable\n\n"
+        printf "your Favorites also make sure your Thumbnails per\n"
+        printf "Page Setting matches the THUMBS Variable\n\n"
         printf "Press any key to exit\n"
         read -r
         exit
@@ -142,7 +142,7 @@ function downloadWallpapers {
         do
             if grep -w "$imgURL" downloaded.txt >/dev/null
             then
-                printf "\n\tWallpaper %s already downloaded!" "$imgURL"
+                printf "\tWallpaper %s already downloaded!\n" "$imgURL"
             elif [ $PARALLEL == 1 ]
             then
                 echo "$imgURL" >> download.txt
@@ -210,7 +210,7 @@ function WGET {
     # default wget command
     userAgent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) "
     userAgent+="Gecko/20100101 Firefox/48.0"
-    wget -q -U "$userAgent" --keep-session-cookies \
+    wget -q -c -U "$userAgent" --keep-session-cookies \
         --save-cookies=cookies.txt --load-cookies=cookies.txt "$@"
 }
 
@@ -319,7 +319,7 @@ while [[ $# -ge 1 ]]
             exit
             ;;
         -v|--version)
-            printf "Wallhaven Downloader %s" "$REVISION"
+            printf "Wallhaven Downloader %s\n" "$REVISION"
             exit
             ;;
         *)
