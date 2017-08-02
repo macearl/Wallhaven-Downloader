@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.1.7.2
+REVISION=0.1.7.3
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -145,11 +145,14 @@ function downloadWallpapers {
                 printf "\n\tWallpaper %s already downloaded!" "$imgURL"
             elif [ $PARALLEL == 1 ]
             then
-                echo "$imgURL" >> downloaded.txt
                 echo "$imgURL" >> download.txt
             else
-                echo "$imgURL" >> downloaded.txt
                 downloadWallpaper "$imgURL"
+                # check if downloadWallpaper was successful
+                if [ $? == 1 ]
+                then
+                    echo "$imgURL" >> downloaded.txt
+                fi
             fi
         done
 
@@ -161,7 +164,7 @@ function downloadWallpapers {
         # available for parallel
         export -f WGET downloadWallpaper
         SHELL=$(type -p bash) parallel --gnu --no-notice \
-            'downloadWallpaper {}' < download.txt
+            'imgURL={} && ! downloadWallpaper $imgURL && echo $imgURL >> downloaded.txt' < download.txt
             rm tmp download.txt
         else
             rm tmp
@@ -364,15 +367,15 @@ then
             count< "$WPNUMBER";
             count=count+"$THUMBS", page=page+1 ));
     do
-        printf "Download Page %s" "$page"
+        printf "Download Page %s\n" "$page"
         s1="search?page=$page&categories=$CATEGORIES&purity=$FILTER&"
         s1+="resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE"
         s1+="&order=$ORDER"
         getPage "$s1"
-        printf "\n\t- done!\n"
-        printf "Download Wallpapers from Page %s" "$page"
+        printf "\t- done!\n"
+        printf "Download Wallpapers from Page %s\n" "$page"
         downloadWallpapers
-        printf "\n\t- done!\n"
+        printf "\t- done!\n"
     done
 
 elif [ "$TYPE" == search ]
@@ -382,15 +385,15 @@ then
             count< "$WPNUMBER";
             count=count+"$THUMBS", page=page+1 ));
     do
-        printf "Download Page %s" "$page"
+        printf "Download Page %s\n" "$page"
         s1="search?page=$page&categories=$CATEGORIES&purity=$FILTER&"
         s1+="resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE"
         s1+="&order=desc&q=$QUERY"
         getPage "$s1"
-        printf "\n\t- done!\n"
-        printf "Download Wallpapers from Page %s" "$page"
+        printf "\t- done!\n"
+        printf "Download Wallpapers from Page %s\n" "$page"
         downloadWallpapers
-        printf "\n\t- done!\n"
+        printf "\t- done!\n"
     done
 
 elif [ "$TYPE" == favorites ]
@@ -406,12 +409,12 @@ then
             count< "$WPNUMBER" && count< "$favnumber";
             count=count+"$THUMBS", page=page+1 ));
     do
-        printf "Download Page %s" "$page"
+        printf "Download Page %s\n" "$page"
         getPage "favorites?page=$page"
-        printf "\n\t- done!\n"
-        printf "Download Wallpapers from Page %s" "$page"
+        printf "\t- done!\n"
+        printf "Download Wallpapers from Page %s\n" "$page"
         downloadWallpapers
-        printf "\n\t- done!\n"
+        printf "\t- done!\n"
     done
 
 elif [ "$TYPE" == useruploads ]
@@ -421,12 +424,12 @@ then
             count< "$WPNUMBER";
             count=count+"$THUMBS", page=page+1 ));
     do
-        printf "Download Page %s" "$page"
+        printf "Download Page %s\n" "$page"
         getPage "user/$USR/uploads?page=$page&purity=$FILTER"
-        printf "\n\t- done!\n"
-        printf "Download Wallpapers from Page %s" "$page"
+        printf "\t- done!\n"
+        printf "Download Wallpapers from Page %s\n" "$page"
         downloadWallpapers
-        printf "\n\t- done!\n"
+        printf "\t- done!\n"
     done
 
 else

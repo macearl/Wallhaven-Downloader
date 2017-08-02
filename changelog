@@ -1,4 +1,7 @@
 Changelog
+ Revision 0.1.7.3
+ 1. only add wallpaper id to downloaded after successful download
+
  Revision 0.1.7.2
  1. urlencode password to accomodate special characters
 
