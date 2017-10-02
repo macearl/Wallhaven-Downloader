@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.1.7.3
+REVISION=0.1.7.5
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -53,12 +53,16 @@ RESOLUTION=
 # two options and leave the other blank
 ATLEAST=
 # Which aspectratios should be downloaded, leave empty for all (possible
-# values: 4x3, 5x4, 16x9, 16x10, 32x9, 48x9), separate mutliple ratios
+# values: 4x3, 5x4, 16x9, 16x10, 21x9, 32x9, 48x9, 9x16, 10x16), separate mutliple ratios
 # with , eg. 4x3,16x9
 ASPECTRATIO=
 # Which Type should be displayed (relevance, random, date_added, views,
-# favorites)
+# favorites, toplist)
 MODE=random
+# if MODE is set to toplist show the toplist for the given timeframe
+# possible values: 1d (last day), 3d (last 3 days), 1w (last week),
+# 1m (last month), 3m (last 3 months), 6m (last 6 months), 1y (last year)
+TOPRANGE=
 # How should the wallpapers be ordered (desc, asc)
 ORDER=desc
 # Searchterm, only used if TYPE = search
@@ -381,7 +385,7 @@ then
         printf "Download Page %s\n" "$page"
         s1="search?page=$page&categories=$CATEGORIES&purity=$FILTER&"
         s1+="atleast=$ATLEAST&resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE"
-        s1+="&order=$ORDER"
+        s1+="&order=$ORDER&topRange=$TOPRANGE"
         getPage "$s1"
         printf "\t- done!\n"
         printf "Download Wallpapers from Page %s\n" "$page"
