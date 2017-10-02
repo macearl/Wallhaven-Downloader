@@ -47,6 +47,11 @@ FILTER=110
 # resolutions possible, for details see wallhaven site), separate multiple
 # resolutions with , eg. 1920x1080,1920x1200
 RESOLUTION=
+# alternatively specify a minimum resolution, please note that specifying
+# both resolutions and a minimum resolution will result in the desired
+# resolutions being ignored, to avoid unwanted behavior only set one of the
+# two options and leave the other blank
+ATLEAST=
 # Which aspectratios should be downloaded, leave empty for all (possible
 # values: 4x3, 5x4, 16x9, 16x10, 32x9, 48x9), separate mutliple ratios
 # with , eg. 4x3,16x9
@@ -234,7 +239,10 @@ function helpText {
     printf 'eg. 111 \n\t\t\tfor SFW, sketchy and NSFW content, 1 to '
     printf 'include, \n\t\t\t0 to exclude\n'
     printf ' -r, --resolution\tresolutions to download, separate mutliple'
-    printf ' \n\t\t\tresolutions by ,\n'
+    printf '\n\t\t\tresolutions by ,\n'
+    printf ' -g, --atleast\t\tminimum resolution, show all images with a'
+    printf '\n\t\t\tresolution greater than the specified value'
+    printf '\n\t\t\tdo not use in combination with -r (--resolution)\n'
     printf ' -a, --aspectratio\tonly download wallpaper with given '
     printf 'aspectratios, \n\t\t\tseparate multiple aspectratios by ,\n'
     printf ' -m, --mode\t\tsorting mode for wallpapers: relevance, random'
@@ -251,20 +259,20 @@ function helpText {
     printf ' -v, --version\t\tshow current version\n'
     printf ' -h, --help\t\tshow this help text and exit\n\n'
     printf 'Examples:\n'
-    printf './wallhaven.sh\t-l ~/wp/ -n 48 -s 1 -t standard -c 101 -f 111 '
-    printf '-r 1920x1080 \n\t\t-a 16x9 -m random -o desc -p 1\n\n'
+    printf './wallhaven.sh\t-l ~/wp/ -n 48 -s 1 -t standard -c 101 -f 111'
+    printf ' -r 1920x1080 \n\t\t-a 16x9 -m random -o desc -p 1\n\n'
     printf 'Download 48 random wallpapers with a resolution of 1920x1080 '
     printf 'and \nan aspectratio of 16x9 to ~/wp/ starting with page 1 '
     printf 'from the \ncategories general and people including SFW, sketchy'
     printf ' and NSWF Content\nwhile utilizing gnu parallel\n\n'
-    printf './wallhaven.sh\t-l ~/wp/ -n 48 -s 1 -t search -c 111 -f 111 -r '
+    printf './wallhaven.sh\t-l ~/wp/ -n 48 -s 1 -t search -c 111 -f 100 -r '
     printf '1920x1080 \n\t\t-a 16x9 -m relevance -o desc -q '
     printf ''\''"super mario"'\'' -p 1\n\n'
     printf 'Download 48 wallpapers related to the search query '
     printf '"super mario" with\na resolution of 1920x1080 and an '
     printf 'aspectratio of 16x9 to ~/wp/ starting\nwith page 1 from the '
-    printf 'categories general, anime and people including SFW,\nsketchy '
-    printf 'and NSWF Content while utilizing gnu parallel\n\n\n'
+    printf 'categories general, anime and people only include SFW\n'
+    printf 'Content while utilizing gnu parallel\n\n\n'
     printf 'latest version available at: '
     printf '<https://github.com/macearl/Wallhaven-Downloader>\n'
 } # helptext
@@ -295,6 +303,9 @@ while [[ $# -ge 1 ]]
             shift;;
         -r|--resolution)
             RESOLUTION="$2"
+            shift;;
+        -g|--atleast)
+            ATLEAST="$2"
             shift;;
         -a|--aspectratio)
             ASPECTRATIO="$2"
@@ -369,7 +380,7 @@ then
     do
         printf "Download Page %s\n" "$page"
         s1="search?page=$page&categories=$CATEGORIES&purity=$FILTER&"
-        s1+="resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE"
+        s1+="atleast=$ATLEAST&resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE"
         s1+="&order=$ORDER"
         getPage "$s1"
         printf "\t- done!\n"
@@ -387,7 +398,7 @@ then
     do
         printf "Download Page %s\n" "$page"
         s1="search?page=$page&categories=$CATEGORIES&purity=$FILTER&"
-        s1+="resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE"
+        s1+="atleast=$ATLEAST&resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE"
         s1+="&order=desc&q=$QUERY"
         getPage "$s1"
         printf "\t- done!\n"
