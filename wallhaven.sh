@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.1.7.5
+REVISION=0.1.8
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -66,7 +66,14 @@ TOPRANGE=
 # How should the wallpapers be ordered (desc, asc)
 ORDER=desc
 # Searchterm, only used if TYPE = search
+# you can also search by tags, use id:TAGID
+# to get the tag id take a look at: https://alpha.wallhaven.cc/tags/
+# for example: to search for nature related wallpapers via the nature tag
+# instead of the keyword use QUERY="id:37"
 QUERY="nature"
+# Search images containing color
+# values are RGB (000000 = black, ffffff = white, ff0000 = red, ...)
+COLOR=""
 # Should the search results be saved to a separate subfolder?
 # 0 for no separate folder, 1 for separate subfolder
 SUBFOLDER=0
@@ -96,11 +103,11 @@ function login {
     # checking parameters -> if not ok print error and exit script
     if [ $# -lt 2 ] || [ "$1" == '' ] || [ "$2" == '' ]
     then
-        printf "Please make sure to enter valid login credentials,\n"
-        printf "they are needed for NSFW Content and downloading \n"
-        printf "your Favorites also make sure your Thumbnails per\n"
-        printf "Page Setting matches the THUMBS Variable\n\n"
-        printf "Press any key to exit\n"
+        printf "Please make sure to enter valid login credentials,\\n"
+        printf "they are needed for NSFW Content and downloading \\n"
+        printf "your Favorites also make sure your Thumbnails per\\n"
+        printf "Page Setting matches the THUMBS Variable\\n\\n"
+        printf "Press any key to exit\\n"
         read -r
         exit
     fi
@@ -124,9 +131,9 @@ function getPage {
     # checking parameters -> if not ok print error and exit script
     if [ $# -lt 1 ]
     then
-        printf "getPage expects at least 1 argument\n"
-        printf "arg1:\tparameters for the wget -q command\n\n"
-        printf "press any key to exit\n"
+        printf "getPage expects at least 1 argument\\n"
+        printf "arg1:\\tparameters for the wget -q command\\n\\n"
+        printf "press any key to exit\\n"
         read -r
         exit
     fi
@@ -145,13 +152,13 @@ function downloadWallpapers {
     URLSFORIMAGES="$(grep -o 'th-[0-9]*' tmp | sed  's .\{3\}  ')"
 
     OIFS="$IFS"
-    IFS=$'\n'
+    IFS=$'\\n'
 
     for imgURL in $URLSFORIMAGES
         do
             if grep -w "$imgURL" downloaded.txt >/dev/null
             then
-                printf "\tWallpaper %s already downloaded!\n" "$imgURL"
+                printf "\\tWallpaper %s already downloaded!\\n" "$imgURL"
             elif [ $PARALLEL == 1 ]
             then
                 echo "$imgURL" >> download.txt
@@ -178,7 +185,7 @@ function downloadWallpapers {
         else
             rm tmp
     fi
-} #/downloadWallpapers
+} # /downloadWallpapers
 
 #
 # downloads a single Wallpaper by guessing its extension, this eliminates
@@ -197,8 +204,8 @@ function downloadWallpaper {
         https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-"$1".png &&
     ! WGET --referer=https://alpha.wallhaven.cc/wallpaper/"$1" \
         https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-"$1".gif &&
-    printf "Could not determine file extension for id: %s\n" "$1"
-}
+    printf "Could not determine file extension for id: %s\\n" "$1"
+} # /downloadWallpaper
 
 #
 # wrapper for wget with some default arguments
@@ -209,10 +216,10 @@ function WGET {
     # checking parameters -> if not ok print error and exit script
     if [ $# -lt 1 ]
     then
-        printf "WGET expects at least 1 argument\n"
-        printf "arg0:\tadditional arguments for wget (optional)\n"
-        printf "arg1:\tfile to download\n\n"
-        printf "press any key to exit\n"
+        printf "WGET expects at least 1 argument\\n"
+        printf "arg0:\\tadditional arguments for wget (optional)\\n"
+        printf "arg1:\\tfile to download\\n\\n"
+        printf "press any key to exit\\n"
         read -r
         exit
     fi
@@ -221,65 +228,69 @@ function WGET {
     userAgent+="Gecko/20100101 Firefox/48.0"
     wget -q -c -U "$userAgent" --keep-session-cookies \
         --save-cookies=cookies.txt --load-cookies=cookies.txt "$@"
-}
+} # /WGET
 
 #
 # displays help text (valid command line arguments)
 #
 function helpText {
-    printf 'Usage: ./wallhaven.sh [OPTIONS]\n'
-    printf 'Download wallpapers from wallhaven.cc\n\n'
-    printf 'If no options are specified, default values from within the '
-    printf 'script will be used\n\n'
-    printf ' -l, --location\t\tlocation where the wallpapers will be '
-    printf 'stored\n'
-    printf ' -n, --number\t\tNumber of Wallpapers to download\n'
-    printf ' -s, --startpage\tpage to start downloading from\n'
-    printf ' -t, --type\t\tType of download Operation: standard, search, '
-    printf '\n\t\t\tfavorites, useruploads\n'
-    printf ' -c, --categories\tcategories to download from, eg. 111 for '
-    printf 'General,\n\t\t\tAnime and People, 1 to include, 0 to exclude\n'
-    printf ' -f, --filter\t\tfilter out content based on purity rating, '
-    printf 'eg. 111 \n\t\t\tfor SFW, sketchy and NSFW content, 1 to '
-    printf 'include, \n\t\t\t0 to exclude\n'
-    printf ' -r, --resolution\tresolutions to download, separate mutliple'
-    printf '\n\t\t\tresolutions by ,\n'
-    printf ' -g, --atleast\t\tminimum resolution, show all images with a'
-    printf '\n\t\t\tresolution greater than the specified value'
-    printf '\n\t\t\tdo not use in combination with -r (--resolution)\n'
-    printf ' -a, --aspectratio\tonly download wallpaper with given '
-    printf 'aspectratios, \n\t\t\tseparate multiple aspectratios by ,\n'
-    printf ' -m, --mode\t\tsorting mode for wallpapers: relevance, random'
-    printf ',\n\t\t\tdate_added, views, favorites \n'
-    printf ' -o, --order\t\torder ascending (asc) oder descending '
-    printf '(desc)\n'
-    printf ' -q, --query\t\tsearch query, eg. '\''mario'\'', single '
-    printf 'quotes needed,\n\t\t\tfor searching exact phrases use double '
-    printf 'quotes \n\t\t\tinside single quotes, eg. '\''"super mario"'\'' '
-    printf '\n'
-    printf ' -u, --user\t\tdownload wallpapers from given user\n'
-    printf ' -p, --parallel\t\tmake use of gnu parallel (1 to enable, 0 '
-    printf 'to disable)\n'
-    printf ' -v, --version\t\tshow current version\n'
-    printf ' -h, --help\t\tshow this help text and exit\n\n'
-    printf 'Examples:\n'
-    printf './wallhaven.sh\t-l ~/wp/ -n 48 -s 1 -t standard -c 101 -f 111'
-    printf ' -r 1920x1080 \n\t\t-a 16x9 -m random -o desc -p 1\n\n'
-    printf 'Download 48 random wallpapers with a resolution of 1920x1080 '
-    printf 'and \nan aspectratio of 16x9 to ~/wp/ starting with page 1 '
-    printf 'from the \ncategories general and people including SFW, sketchy'
-    printf ' and NSWF Content\nwhile utilizing gnu parallel\n\n'
-    printf './wallhaven.sh\t-l ~/wp/ -n 48 -s 1 -t search -c 111 -f 100 -r '
-    printf '1920x1080 \n\t\t-a 16x9 -m relevance -o desc -q '
-    printf ''\''"super mario"'\'' -p 1\n\n'
-    printf 'Download 48 wallpapers related to the search query '
-    printf '"super mario" with\na resolution of 1920x1080 and an '
-    printf 'aspectratio of 16x9 to ~/wp/ starting\nwith page 1 from the '
-    printf 'categories general, anime and people only include SFW\n'
-    printf 'Content while utilizing gnu parallel\n\n\n'
-    printf 'latest version available at: '
-    printf '<https://github.com/macearl/Wallhaven-Downloader>\n'
-} # helptext
+    printf "Usage: ./wallhaven.sh [OPTIONS]\\n"
+    printf "Download wallpapers from wallhaven.cc\\n\\n"
+    printf "If no options are specified, default values from within the "
+    printf "script will be used\\n\\n"
+    printf " -l, --location\\t\\tlocation where the wallpapers will be "
+    printf "stored\\n"
+    printf " -n, --number\\t\\tNumber of Wallpapers to download\\n"
+    printf " -s, --startpage\\tpage to start downloading from\\n"
+    printf " -t, --type\\t\\tType of download Operation: standard, search, "
+    printf "\\n\\t\\t\\tfavorites, useruploads\\n"
+    printf " -c, --categories\\tcategories to download from, eg. 111 for "
+    printf "General,\\n\\t\\t\\tAnime and People, 1 to include, 0 to exclude\\n"
+    printf " -f, --filter\\t\\tfilter out content based on purity rating, "
+    printf "eg. 111 \\n\\t\\t\\tfor SFW, sketchy and NSFW content, 1 to "
+    printf "include, \\n\\t\\t\\t0 to exclude\\n"
+    printf " -r, --resolution\\tresolutions to download, separate mutliple"
+    printf " \\n\\t\\t\\tresolutions by ,\\n"
+    printf " -g, --atleast\\t\\tminimum resolution, show all images with a"
+    printf "\\n\\t\\t\\tresolution greater than the specified value"
+    printf "\\n\\t\\t\\tdo not use in combination with -r (--resolution)\\n"
+    printf " -a, --aspectratio\\tonly download wallpaper with given "
+    printf "aspectratios, \\n\\t\\t\\tseparate multiple aspectratios by ,\\n"
+    printf " -m, --mode\\t\\tsorting mode for wallpapers: relevance, random"
+    printf ",\\n\\t\\t\\tdate_added, views, favorites \\n"
+    printf " -o, --order\\t\\torder ascending (asc) or descending "
+    printf "(desc)\\n"
+    printf " -q, --query\\t\\tsearch query, eg. 'mario', single "
+    printf "quotes needed,\\n\\t\\t\\tfor searching exact phrases use double "
+    printf "quotes \\n\\t\\t\\tinside single quotes, eg. '\"super mario\"'"
+    printf "\\n"
+    printf " -d, --dye, --color\\tsearch for wallpapers containing the "
+    printf "given color,\\n"
+    printf "\\t\\t\\tcolor values are RGB without a leading #\\n"
+    printf " -u, --user\\t\\tdownload wallpapers from given user\\n"
+    printf " -p, --parallel\\t\\tmake use of gnu parallel (1 to enable, 0 "
+    printf "to disable)\\n"
+    printf " -v, --version\\t\\tshow current version\\n"
+    printf " -h, --help\\t\\tshow this help text and exit\\n\\n"
+    printf "Examples:\\n"
+    printf "./wallhaven.sh\\t-l ~/wp/ -n 48 -s 1 -t standard -c 101 -f 111"
+    printf " -r 1920x1080 \\n\\t\\t-a 16x9 -m random -o desc -p 1\\n\\n"
+    printf "Download 48 random wallpapers with a resolution of 1920x1080 "
+    printf "and \\nan aspectratio of 16x9 to ~/wp/ starting with page 1 "
+    printf "from the \\ncategories general and people including SFW, sketchy"
+    printf " and NSWF Content\\nwhile utilizing gnu parallel\\n\\n"
+    printf "./wallhaven.sh\\t-l ~/wp/ -n 48 -s 1 -t search -c 111 -f 100 -r "
+    printf "1920x1080 -a 16x9\\n\\t\\t-m relevance -o desc -q "
+    printf "'\"super mario\"' -d cc0000 -p 1\\n\\n"
+    printf "Download 48 wallpapers related to the search query "
+    printf "\"super mario\" containing \\nthe color #cc0000 with a resolution"
+    printf " of 1920x1080 and an aspectratio of 16x9\\nto ~/wp/ starting "
+    printf "with page 1 from the categories general, anime and people,\\n"
+    printf "including SFW Content and excluding sketchy and NSWF Content "
+    printf "while utilizing\\ngnu parallel\\n\\n\\n"
+    printf "latest version available at: "
+    printf "<https://github.com/macearl/Wallhaven-Downloader>\\n"
+} # /helptext
 
 # Command line Arguments
 while [[ $# -ge 1 ]]
@@ -323,6 +334,9 @@ while [[ $# -ge 1 ]]
         -q|--query)
             QUERY=${2//\'/}
             shift;;
+        -d|--dye|--color)
+            COLOR="$2"
+            shift;;
         -u|--user)
             USR="$2"
             shift;;
@@ -334,11 +348,11 @@ while [[ $# -ge 1 ]]
             exit
             ;;
         -v|--version)
-            printf "Wallhaven Downloader %s\n" "$REVISION"
+            printf "Wallhaven Downloader %s\\n" "$REVISION"
             exit
             ;;
         *)
-            printf "unknown option: %s\n" "$1"
+            printf "unknown option: %s\\n" "$1"
             helpText
             exit
             ;;
@@ -351,7 +365,7 @@ while [[ $# -ge 1 ]]
 # downloaded wallpapers
 if [ "$TYPE" == search ] && [ "$SUBFOLDER" == 1 ]
 then
-    LOCATION+=/$(echo "$QUERY" | sed -e "s/ /_/g" -e "s/+/_/g" -e  "s/\///g")
+    LOCATION+=/$(echo "$QUERY" | sed -e "s/ /_/g" -e "s/+/_/g" -e  "s/\\//_/g")
 fi
 
 # creates Location folder if it does not exist
@@ -382,15 +396,15 @@ then
             count< "$WPNUMBER";
             count=count+"$THUMBS", page=page+1 ));
     do
-        printf "Download Page %s\n" "$page"
+        printf "Download Page %s\\n" "$page"
         s1="search?page=$page&categories=$CATEGORIES&purity=$FILTER&"
-        s1+="atleast=$ATLEAST&resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE"
-        s1+="&order=$ORDER&topRange=$TOPRANGE"
+        s1+="atleast=$ATLEAST&resolutions=$RESOLUTION&ratios=$ASPECTRATIO"
+        s1+="&sorting=$MODE&order=$ORDER&topRange=$TOPRANGE&colors=$COLOR"
         getPage "$s1"
-        printf "\t- done!\n"
-        printf "Download Wallpapers from Page %s\n" "$page"
+        printf "\\t- done!\\n"
+        printf "Download Wallpapers from Page %s\\n" "$page"
         downloadWallpapers
-        printf "\t- done!\n"
+        printf "\\t- done!\\n"
     done
 
 elif [ "$TYPE" == search ]
@@ -400,15 +414,15 @@ then
             count< "$WPNUMBER";
             count=count+"$THUMBS", page=page+1 ));
     do
-        printf "Download Page %s\n" "$page"
+        printf "Download Page %s\\n" "$page"
         s1="search?page=$page&categories=$CATEGORIES&purity=$FILTER&"
-        s1+="atleast=$ATLEAST&resolutions=$RESOLUTION&ratios=$ASPECTRATIO&sorting=$MODE"
-        s1+="&order=desc&q=$QUERY"
+        s1+="atleast=$ATLEAST&resolutions=$RESOLUTION&ratios=$ASPECTRATIO"
+        s1+="&sorting=$MODE&order=desc&q=$QUERY&topRange=$TOPRANGE&colors=$COLOR"
         getPage "$s1"
-        printf "\t- done!\n"
-        printf "Download Wallpapers from Page %s\n" "$page"
+        printf "\\t- done!\\n"
+        printf "Download Wallpapers from Page %s\\n" "$page"
         downloadWallpapers
-        printf "\t- done!\n"
+        printf "\\t- done!\\n"
     done
 
 elif [ "$TYPE" == favorites ]
@@ -424,12 +438,12 @@ then
             count< "$WPNUMBER" && count< "$favnumber";
             count=count+"$THUMBS", page=page+1 ));
     do
-        printf "Download Page %s\n" "$page"
+        printf "Download Page %s\\n" "$page"
         getPage "favorites?page=$page"
-        printf "\t- done!\n"
-        printf "Download Wallpapers from Page %s\n" "$page"
+        printf "\\t- done!\\n"
+        printf "Download Wallpapers from Page %s\\n" "$page"
         downloadWallpapers
-        printf "\t- done!\n"
+        printf "\\t- done!\\n"
     done
 
 elif [ "$TYPE" == useruploads ]
@@ -439,16 +453,16 @@ then
             count< "$WPNUMBER";
             count=count+"$THUMBS", page=page+1 ));
     do
-        printf "Download Page %s\n" "$page"
+        printf "Download Page %s\\n" "$page"
         getPage "user/$USR/uploads?page=$page&purity=$FILTER"
-        printf "\t- done!\n"
-        printf "Download Wallpapers from Page %s\n" "$page"
+        printf "\\t- done!\\n"
+        printf "Download Wallpapers from Page %s\\n" "$page"
         downloadWallpapers
-        printf "\t- done!\n"
+        printf "\\t- done!\\n"
     done
 
 else
-    printf "error in TYPE please check Variable\n"
+    printf "error in TYPE please check Variable\\n"
 fi
 
 rm -f cookies.txt login login.1

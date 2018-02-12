@@ -1,4 +1,9 @@
 Changelog
+ Revision 0.1.8
+ 1. added option to download wallpapers containing a specific color
+ 2. added documentation on how to search by a tag id
+ 3. modified examples in help text
+
  Revision 0.1.7.5
  1. added option to show the toplist for a given timeframe
 
