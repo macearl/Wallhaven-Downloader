@@ -1,4 +1,7 @@
 Changelog
+ Revision 0.1.8.1
+ 1. fixed possible values for Toplist Month
+
  Revision 0.1.8
  1. added option to download wallpapers containing a specific color
  2. added documentation on how to search by a tag id

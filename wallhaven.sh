@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.1.8
+REVISION=0.1.8.1
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -61,7 +61,7 @@ ASPECTRATIO=
 MODE=random
 # if MODE is set to toplist show the toplist for the given timeframe
 # possible values: 1d (last day), 3d (last 3 days), 1w (last week),
-# 1m (last month), 3m (last 3 months), 6m (last 6 months), 1y (last year)
+# 1M (last month), 3M (last 3 months), 6M (last 6 months), 1y (last year)
 TOPRANGE=
 # How should the wallpapers be ordered (desc, asc)
 ORDER=desc
