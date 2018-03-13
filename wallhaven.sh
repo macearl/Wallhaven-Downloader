@@ -152,7 +152,7 @@ function downloadWallpapers {
     URLSFORIMAGES="$(grep -o 'th-[0-9]*' tmp | sed  's .\{3\}  ')"
 
     OIFS="$IFS"
-    IFS=$'\\n'
+    IFS=$'\n'
 
     for imgURL in $URLSFORIMAGES
         do
