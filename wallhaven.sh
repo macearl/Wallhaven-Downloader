@@ -127,6 +127,13 @@ function login {
 #
 # downloads Page with Thumbnails
 #
+
+# get favorites page to extract id number later
+function getFavs {
+	WGET --referer=https://alpha.wallhaven.cc -O favtmp \
+		"https://alpha.wallhaven.cc/favorites"
+}
+
 function getPage {
     # checking parameters -> if not ok print error and exit script
     if [ $# -lt 1 ]
@@ -181,9 +188,9 @@ function downloadWallpapers {
         export -f WGET downloadWallpaper
         SHELL=$(type -p bash) parallel --gnu --no-notice \
             'imgURL={} && ! downloadWallpaper $imgURL && echo $imgURL >> downloaded.txt' < download.txt
-            rm tmp download.txt
+            rm favtmp tmp download.txt
         else
-            rm tmp
+            rm favtmp tmp 
     fi
 } # /downloadWallpapers
 
@@ -428,18 +435,28 @@ then
 elif [ "$TYPE" == favorites ]
 then
     # FAVORITES
-    # currently only using default collection
-    favnumber="$(WGET --referer=https://alpha.wallhaven.cc \
+    read -p "Favorites folder name (blank for Default): " favname
+	if [ -z "$favname" ]
+	then
+		favname="Default"
+	fi
+
+	favnumber="$(WGET --referer=https://alpha.wallhaven.cc \
                 https://alpha.wallhaven.cc/favorites -O - | \
-                grep -o "<small>[0-9]*</small>Default" | \
+                grep -o "<small>[0-9]*</small>$favname" | \
                 sed  's .\{7\}  ' | sed 's/.\{15\}$//')"
+
+	getFavs
+
+	favnumber=$(echo $favnumber | sed 's/[^0-9]*//g')
+	favlistval=$(grep -R "</small>$favname" favtmp | sed -n '/<li id=\"collection-/{s/.*li id=\"collection-//;s/\S*=.*//;p}' | sed s'/.\{2\}$//')
 
     for ((  count=0, page="$STARTPAGE";
             count< "$WPNUMBER" && count< "$favnumber";
             count=count+"$THUMBS", page=page+1 ));
     do
         printf "Download Page %s\\n" "$page"
-        getPage "favorites?page=$page"
+        getPage "favorites/$favlistval?page=$page"
         printf "\\t- done!\\n"
         printf "Download Wallpapers from Page %s\\n" "$page"
         downloadWallpapers
