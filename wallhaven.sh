@@ -272,6 +272,7 @@ function helpText {
     printf ",\\n\\t\\t\\tdate_added, views, favorites \\n"
     printf " -o, --order\\t\\torder ascending (asc) or descending "
     printf "(desc)\\n"
+    printf " -b, --favcollection\\tname of the favorite collections to download\\n"
     printf " -q, --query\\t\\tsearch query, eg. 'mario', single "
     printf "quotes needed,\\n\\t\\t\\tfor searching exact phrases use double "
     printf "quotes \\n\\t\\t\\tinside single quotes, eg. '\"super mario\"'"
@@ -342,6 +343,9 @@ while [[ $# -ge 1 ]]
             shift;;
         -o|--order)
             ORDER="$2"
+            shift;;
+        -b|--favcollection)
+            FAVCOLLECTION="$2"
             shift;;
         -q|--query)
             QUERY=${2//\'/}
