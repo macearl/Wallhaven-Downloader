@@ -132,8 +132,8 @@ function login {
 # get favorites page to extract id number later
 #
 function getFavs {
-	WGET --referer="https://alpha.wallhaven.cc" -O favtmp \
-		"https://alpha.wallhaven.cc/favorites"
+    WGET --referer="https://alpha.wallhaven.cc" -O favtmp \
+        "https://alpha.wallhaven.cc/favorites"
 }
 
 #
@@ -439,15 +439,15 @@ then
 
 elif [ "$TYPE" == favorites ]
 then
-	getFavs
+    getFavs
 
     favnumber="$(grep -o "<small>[0-9]*</small>$FAVCOLLECTION" favtmp | \
                 sed 's/[^0-9]*//g')"
 
-	favlistval=$(grep -Eo "https://alpha.wallhaven.cc/favorites/[0-9]+[^.]*small>$FAVCOLLECTION" \
+    favlistval=$(grep -Eo "https://alpha.wallhaven.cc/favorites/[0-9]+[^.]*small>$FAVCOLLECTION" \
                 favtmp | sed -r 's/([^0-9]*)([0-9]+)(".*)/\2/')
 
-    if [ -z $favnumber] || [ -z $favlistval]
+    if [ -z "$favnumber" ] || [ -z "$favlistval" ]
     then
         printf "Please check the value specified for FAVCOLLECTION\\n"
         printf "it seems that a collection with the name \"%s\" does not exist\\n\\n" \
