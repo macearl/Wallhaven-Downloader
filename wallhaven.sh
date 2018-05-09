@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.1.8.1
+REVISION=0.1.9
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -65,6 +65,10 @@ MODE=random
 TOPRANGE=
 # How should the wallpapers be ordered (desc, asc)
 ORDER=desc
+# favorites collections, only used if TYPE = favorites
+# specify the name of the favorites collection you want to download
+# Default is the default collection name on wallhaven
+FAVCOLLECTION="Default"
 # Searchterm, only used if TYPE = search
 # you can also search by tags, use id:TAGID
 # to get the tag id take a look at: https://alpha.wallhaven.cc/tags/
@@ -113,27 +117,28 @@ function login {
     fi
 
     # everythings ok --> login
-    WGET --referer=https://alpha.wallhaven.cc \
-        https://alpha.wallhaven.cc/auth/login
+    WGET --referer="https://alpha.wallhaven.cc" \
+        "https://alpha.wallhaven.cc/auth/login"
     token="$(grep 'name="_token"' login | sed 's:.*value="::' \
         | sed 's/.\{2\}$//')"
     # source: https://stackoverflow.com/a/17989856
     encoded_pass=$(echo -n "$PASS" | od -An -tx1 | tr ' ' % | xargs printf "%s" )
-    WGET --referer=https://alpha.wallhaven.cc/auth/login \
+    WGET --referer="https://alpha.wallhaven.cc/auth/login" \
         --post-data="_token=$token&username=$USER&password=$encoded_pass" \
-        https://alpha.wallhaven.cc/auth/login
+        "https://alpha.wallhaven.cc/auth/login"
 } # /login
+
+#
+# get favorites page to extract id number later
+#
+function getFavs {
+	WGET --referer="https://alpha.wallhaven.cc" -O favtmp \
+		"https://alpha.wallhaven.cc/favorites"
+}
 
 #
 # downloads Page with Thumbnails
 #
-
-# get favorites page to extract id number later
-function getFavs {
-	WGET --referer=https://alpha.wallhaven.cc -O favtmp \
-		"https://alpha.wallhaven.cc/favorites"
-}
-
 function getPage {
     # checking parameters -> if not ok print error and exit script
     if [ $# -lt 1 ]
@@ -146,7 +151,7 @@ function getPage {
     fi
 
     # parameters ok --> get page
-    WGET --referer=https://alpha.wallhaven.cc -O tmp \
+    WGET --referer="https://alpha.wallhaven.cc" -O tmp \
         "https://alpha.wallhaven.cc/$1"
 } # /getPage
 
@@ -188,9 +193,9 @@ function downloadWallpapers {
         export -f WGET downloadWallpaper
         SHELL=$(type -p bash) parallel --gnu --no-notice \
             'imgURL={} && ! downloadWallpaper $imgURL && echo $imgURL >> downloaded.txt' < download.txt
-            rm favtmp tmp download.txt
+            rm tmp download.txt
         else
-            rm favtmp tmp 
+            rm tmp
     fi
 } # /downloadWallpapers
 
@@ -434,22 +439,23 @@ then
 
 elif [ "$TYPE" == favorites ]
 then
-    # FAVORITES
-    read -p "Favorites folder name (blank for Default): " favname
-	if [ -z "$favname" ]
-	then
-		favname="Default"
-	fi
-
-	favnumber="$(WGET --referer=https://alpha.wallhaven.cc \
-                https://alpha.wallhaven.cc/favorites -O - | \
-                grep -o "<small>[0-9]*</small>$favname" | \
-                sed  's .\{7\}  ' | sed 's/.\{15\}$//')"
-
 	getFavs
 
-	favnumber=$(echo $favnumber | sed 's/[^0-9]*//g')
-	favlistval=$(grep -R "</small>$favname" favtmp | sed -n '/<li id=\"collection-/{s/.*li id=\"collection-//;s/\S*=.*//;p}' | sed s'/.\{2\}$//')
+    favnumber="$(grep -o "<small>[0-9]*</small>$FAVCOLLECTION" favtmp | \
+                sed 's/[^0-9]*//g')"
+
+	favlistval=$(grep -Eo "https://alpha.wallhaven.cc/favorites/[0-9]+[^.]*small>$FAVCOLLECTION" \
+                favtmp | sed -r 's/([^0-9]*)([0-9]+)(".*)/\2/')
+
+    if [ -z $favnumber] || [ -z $favlistval]
+    then
+        printf "Please check the value specified for FAVCOLLECTION\\n"
+        printf "it seems that a collection with the name \"%s\" does not exist\\n\\n" \
+                "$FAVCOLLECTION"
+        printf "Press any key to exit\\n"
+        read -r
+        exit
+    fi
 
     for ((  count=0, page="$STARTPAGE";
             count< "$WPNUMBER" && count< "$favnumber";
@@ -482,4 +488,4 @@ else
     printf "error in TYPE please check Variable\\n"
 fi
 
-rm -f cookies.txt login login.1
+rm -f cookies.txt login login.1 favtmp

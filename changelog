@@ -1,4 +1,8 @@
 Changelog
+ Revision 0.1.9
+ 1. added option to download non default favorite collections
+    thanks to xorb0ss for the pull request
+
  Revision 0.1.8.1
  1. fixed possible values for Toplist Month
 
