@@ -6,17 +6,14 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.1.9
+REVISION=0.2
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
 #####################################
-# Enter your Username
-USER=""
-# Enter your password
-# if your password contains ' you need to escape it
-# replace all ' with '"'"'
-PASS=""
+# Enter your API key
+# you can get it here: https://wallhaven.cc/settings/account
+APIKEY=""
 #####################################
 ### End needed for NSFW/Favorites ###
 #####################################
@@ -65,13 +62,14 @@ MODE=random
 TOPRANGE=
 # How should the wallpapers be ordered (desc, asc)
 ORDER=desc
+# ! currently broken, might be removed
 # favorites collections, only used if TYPE = favorites
 # specify the name of the favorites collection you want to download
 # Default is the default collection name on wallhaven
 FAVCOLLECTION="Default"
 # Searchterm, only used if TYPE = search
 # you can also search by tags, use id:TAGID
-# to get the tag id take a look at: https://alpha.wallhaven.cc/tags/
+# to get the tag id take a look at: https://wallhaven.cc/tags/
 # for example: to search for nature related wallpapers via the nature tag
 # instead of the keyword use QUERY="id:37"
 QUERY="nature"
@@ -89,7 +87,7 @@ USR=AksumkA
 # speed improvements
 PARALLEL=0
 # custom thumbnails per page
-# changeable here: https://alpha.wallhaven.cc/settings/browsing
+# changeable here: https://wallhaven.cc/settings/browsing
 # valid values: 24, 32, 64
 # if set to 32 or 64 you need to provide login credentials
 THUMBS=24
@@ -97,44 +95,48 @@ THUMBS=24
 ###   End Configuration Options   ###
 #####################################
 
+function checkDependencies {
+    printf "Checking dependencies..."
+    dependencies=(wget jq sed)
+    [[ $PARALLEL == 1 ]] && dependencies+=(parallel)
+
+    for name in ${dependencies[@]}
+    do
+        [[ $(which $name 2>/dev/null) ]] ||
+        { printf "\n$name needs to be installed. Use your package manager to do so, e.g. 'sudo apt install $name'";deps=1; }
+    done
+    [[ $deps -ne 1 ]] && printf "OK\n" || { printf "\nInstall the above and rerun this script\n";exit 1; }
+} # /checkDependencies
+
 #
-# logs in to the wallhaven website to give the user more functionality
-# requires 2 arguments:
-# arg1: username
-# arg2: password
+# sets the authentication header/API key to give the user more functionality
+# requires 1 arguments:
+# arg1: API key
 #
-function login {
+function setAPIkeyHeader {
     # checking parameters -> if not ok print error and exit script
-    if [ $# -lt 2 ] || [ "$1" == '' ] || [ "$2" == '' ]
+    if [ $# -lt 1 ] || [ "$1" == '' ]
     then
-        printf "Please make sure to enter valid login credentials,\\n"
-        printf "they are needed for NSFW Content and downloading \\n"
-        printf "your Favorites also make sure your Thumbnails per\\n"
-        printf "Page Setting matches the THUMBS Variable\\n\\n"
-        printf "Press any key to exit\\n"
+        printf "Please make sure to enter a valid API key,\n"
+        printf "it is needed for NSFW Content and downloading \n"
+        printf "your Favorites also make sure your Thumbnails per\n"
+        printf "Page Setting matches the THUMBS Variable\n\n"
+        printf "Press any key to exit\n"
         read -r
         exit
     fi
 
-    # everythings ok --> login
-    WGET --referer="https://alpha.wallhaven.cc" \
-        "https://alpha.wallhaven.cc/auth/login"
-    token="$(grep 'name="_token"' login | sed 's:.*value="::' \
-        | sed 's/.\{2\}$//')"
-    # source: https://stackoverflow.com/a/17989856
-    encoded_pass=$(echo -n "$PASS" | od -An -tx1 | tr ' ' % | xargs printf "%s" )
-    WGET --referer="https://alpha.wallhaven.cc/auth/login" \
-        --post-data="_token=$token&username=$USER&password=$encoded_pass" \
-        "https://alpha.wallhaven.cc/auth/login"
-} # /login
+    # everythings ok --> set api key header
+    httpHeader="X-API-Key: $APIKEY"
+} # /setAPIkeyHeader
 
 #
 # get favorites page to extract id number later
 #
 function getFavs {
-    WGET --referer="https://alpha.wallhaven.cc" -O favtmp \
-        "https://alpha.wallhaven.cc/favorites"
-}
+    WGET --referer="https://wallhaven.cc" -O favtmp \
+        "https://wallhaven.cc/favorites"
+} # /WGET
 
 #
 # downloads Page with Thumbnails
@@ -151,8 +153,7 @@ function getPage {
     fi
 
     # parameters ok --> get page
-    WGET --referer="https://alpha.wallhaven.cc" -O tmp \
-        "https://alpha.wallhaven.cc/$1"
+    WGET -O tmp "https://wallhaven.cc/api/v1/$1"
 } # /getPage
 
 #
@@ -160,31 +161,26 @@ function getPage {
 # arg1: the file containing the wallpapers
 #
 function downloadWallpapers {
-    # get wallpaper id from thumbnails
-    URLSFORIMAGES="$(grep -o 'th-[0-9]*' tmp | sed  's .\{3\}  ')"
+    for ((i=0; i<$THUMBS; i++))
+    do
+        imgURL=$(jq -r ".data[$i].path" tmp)
 
-    OIFS="$IFS"
-    IFS=$'\n'
-
-    for imgURL in $URLSFORIMAGES
-        do
-            if grep -w "$imgURL" downloaded.txt >/dev/null
+        filename=$(echo "$imgURL"| sed "s/.*\///" )
+        if grep -w "$filename" downloaded.txt >/dev/null
+        then
+            printf "\\tWallpaper %s already downloaded!\\n" "$imgURL"
+        elif [ $PARALLEL == 1 ]
+        then
+            echo "$filename" >> download.txt
+        else
+            downloadWallpaper "$imgURL"
+            # check if downloadWallpaper was successful
+            if [ $? == 0 ]
             then
-                printf "\\tWallpaper %s already downloaded!\\n" "$imgURL"
-            elif [ $PARALLEL == 1 ]
-            then
-                echo "$imgURL" >> download.txt
-            else
-                downloadWallpaper "$imgURL"
-                # check if downloadWallpaper was successful
-                if [ $? == 1 ]
-                then
-                    echo "$imgURL" >> downloaded.txt
-                fi
+                echo "$filename" >> downloaded.txt
             fi
-        done
-
-    IFS="$OIFS"
+        fi
+    done
 
     if [ $PARALLEL == 1 ] && [ -f ./download.txt ]
     then
@@ -205,18 +201,12 @@ function downloadWallpapers {
 # needs to be downloaded
 #
 function downloadWallpaper {
-    # try to download wallpaper as jpg, if this fails fall back to png,
-    # if this fails as well fall back on gif, if that doesnt work either
-    # print wallpaper id to manually check which extension it has
-    # if the last case occurs to you please report the id back to me,
-    # so that i can add the missing extension
-    ! WGET --referer=https://alpha.wallhaven.cc/wallpaper/"$1" \
-        https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-"$1".jpg &&
-    ! WGET --referer=https://alpha.wallhaven.cc/wallpaper/"$1" \
-        https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-"$1".png &&
-    ! WGET --referer=https://alpha.wallhaven.cc/wallpaper/"$1" \
-        https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-"$1".gif &&
-    printf "Could not determine file extension for id: %s\\n" "$1"
+    if [[ "$1" != null ]]
+    then
+        WGET "$1"
+    else
+        return 1
+    fi
 } # /downloadWallpaper
 
 #
@@ -235,11 +225,9 @@ function WGET {
         read -r
         exit
     fi
+
     # default wget command
-    userAgent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) "
-    userAgent+="Gecko/20100101 Firefox/48.0"
-    wget -q -c -U "$userAgent" --keep-session-cookies \
-        --save-cookies=cookies.txt --load-cookies=cookies.txt "$@"
+    wget -c -q --header="$httpHeader" "$@"
 } # /WGET
 
 #
@@ -376,6 +364,8 @@ while [[ $# -ge 1 ]]
     shift # past argument or value
     done
 
+checkDependencies
+
 # optionally create a separate subfolder for each search query
 # might download duplicates as each search query has its own list of
 # downloaded wallpapers
@@ -398,12 +388,12 @@ then
     touch downloaded.txt
 fi
 
-# login only when it is required ( for example to download favourites or
-# nsfw content... )
+# set auth header only when it is required ( for example to download favourites
+# or nsfw content... )
 if  [ "$FILTER" == 001 ] || [ "$FILTER" == 011 ] || [ "$FILTER" == 111 ] \
     || [ "$TYPE" == favorites ] || [ "$THUMBS" != 24 ]
 then
-    login "$USER" "$PASS"
+    setAPIkeyHeader "$APIKEY"
 fi
 
 if [ "$TYPE" == standard ]
@@ -423,9 +413,8 @@ then
         printf "\\t- done!\\n"
     done
 
-elif [ "$TYPE" == search ]
+elif [ "$TYPE" == search ] || [ "$TYPE" == useruploads ]
 then
-    # SEARCH
     for ((  count=0, page="$STARTPAGE";
             count< "$WPNUMBER";
             count=count+"$THUMBS", page=page+1 ));
@@ -433,7 +422,10 @@ then
         printf "Download Page %s\\n" "$page"
         s1="search?page=$page&categories=$CATEGORIES&purity=$FILTER&"
         s1+="atleast=$ATLEAST&resolutions=$RESOLUTION&ratios=$ASPECTRATIO"
-        s1+="&sorting=$MODE&order=desc&q=$QUERY&topRange=$TOPRANGE&colors=$COLOR"
+        s1+="&sorting=$MODE&order=desc&topRange=$TOPRANGE&colors=$COLOR"
+        [[ "$TYPE" == search ]] && s1+="&q=$QUERY" || \
+        [[ "$TYPE" == useruploads ]] && s1+="&q=@$USR"
+
         getPage "$s1"
         printf "\\t- done!\\n"
         printf "Download Wallpapers from Page %s\\n" "$page"
@@ -448,7 +440,7 @@ then
     favnumber="$(grep -o "<small>[0-9]*</small>$FAVCOLLECTION" favtmp | \
                 sed 's/[^0-9]*//g')"
 
-    favlistval=$(grep -Eo "https://alpha.wallhaven.cc/favorites/[0-9]+[^.]*small>$FAVCOLLECTION" \
+    favlistval=$(grep -Eo "https://wallhaven.cc/favorites/[0-9]+[^.]*small>$FAVCOLLECTION" \
                 favtmp | sed -r 's/([^0-9]*)([0-9]+)(".*)/\2/')
 
     if [ -z "$favnumber" ] || [ -z "$favlistval" ]

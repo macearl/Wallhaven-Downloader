@@ -1,4 +1,11 @@
 Changelog
+ Revision 0.2
+ 1. switched to newly introduced API
+ 2. jq is now a dependency
+ 3. favorites are currently broken as there is no API endpoint,
+    currently undecided if the feature will be removed or if i'll
+    readd scraping and login just for this
+
  Revision 0.1.9
  1. added option to download non default favorite collections
     thanks to xorb0ss for the pull request
