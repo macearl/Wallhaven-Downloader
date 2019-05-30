@@ -1,4 +1,7 @@
 Changelog
+ Revision 0.2.1
+ 1. fixed error which prevented parallel downloading
+
  Revision 0.2
  1. switched to newly introduced API
  2. jq is now a dependency

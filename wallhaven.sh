@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.2
+REVISION=0.2.1
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -171,7 +171,7 @@ function downloadWallpapers {
             printf "\\tWallpaper %s already downloaded!\\n" "$imgURL"
         elif [ $PARALLEL == 1 ]
         then
-            echo "$filename" >> download.txt
+            echo "$imgURL" >> download.txt
         else
             downloadWallpaper "$imgURL"
             # check if downloadWallpaper was successful
