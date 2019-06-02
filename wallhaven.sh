@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.2.1
+REVISION=0.2.2
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -188,7 +188,7 @@ function downloadWallpapers {
         # available for parallel
         export -f WGET downloadWallpaper
         SHELL=$(type -p bash) parallel --gnu --no-notice \
-            'imgURL={} && ! downloadWallpaper $imgURL && echo $imgURL >> downloaded.txt' < download.txt
+            'imgURL={} && downloadWallpaper $imgURL && echo "$imgURL"| sed "s/.*\///" >> downloaded.txt' < download.txt
             rm tmp download.txt
         else
             rm tmp

@@ -1,4 +1,7 @@
 Changelog
+ Revision 0.2.2
+ 1. fixed error in parallel download logging
+
  Revision 0.2.1
  1. fixed error which prevented parallel downloading
 
