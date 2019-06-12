@@ -423,8 +423,13 @@ then
         s1="search?page=$page&categories=$CATEGORIES&purity=$FILTER&"
         s1+="atleast=$ATLEAST&resolutions=$RESOLUTION&ratios=$ASPECTRATIO"
         s1+="&sorting=$MODE&order=desc&topRange=$TOPRANGE&colors=$COLOR"
-        [[ "$TYPE" == search ]] && s1+="&q=$QUERY" || \
-        [[ "$TYPE" == useruploads ]] && s1+="&q=@$USR"
+        if [ "$TYPE" == search ]
+        then
+            s1+="&q=$QUERY"
+        elif [ "$TYPE" == useruploads ]
+        then
+            s1+="&q=@$USR"
+        fi
 
         getPage "$s1"
         printf "\\t- done!\\n"
