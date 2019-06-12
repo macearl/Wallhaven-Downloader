@@ -1,4 +1,8 @@
 Changelog
+ Revision 0.2.3
+ 1. fixed search function
+ 2. removed continue from wget, can cause problems with the downloaded json
+
  Revision 0.2.2
  1. fixed error in parallel download logging
 

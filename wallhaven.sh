@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.2.2
+REVISION=0.2.3
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -136,7 +136,7 @@ function setAPIkeyHeader {
 function getFavs {
     WGET --referer="https://wallhaven.cc" -O favtmp \
         "https://wallhaven.cc/favorites"
-} # /WGET
+} # /getFavs
 
 #
 # downloads Page with Thumbnails
@@ -227,7 +227,7 @@ function WGET {
     fi
 
     # default wget command
-    wget -c -q --header="$httpHeader" "$@"
+    wget -q --header="$httpHeader" "$@"
 } # /WGET
 
 #
