@@ -89,7 +89,7 @@ PARALLEL=0
 # custom thumbnails per page
 # changeable here: https://wallhaven.cc/settings/browsing
 # valid values: 24, 32, 64
-# if set to 32 or 64 you need to provide login credentials
+# if set to 32 or 64 you need to provide an api key
 THUMBS=24
 #####################################
 ###   End Configuration Options   ###
@@ -489,4 +489,4 @@ else
     printf "error in TYPE please check Variable\\n"
 fi
 
-rm -f cookies.txt login login.1 favtmp
+rm -f favtmp
