@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.2.3
+REVISION=0.2.4
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -164,6 +164,11 @@ function downloadWallpapers {
     for ((i=0; i<$THUMBS; i++))
     do
         imgURL=$(jq -r ".data[$i].path" tmp)
+
+        if (( "$page" >= "$(jq -r ".meta.last_page" tmp)" ))
+        then
+            downloadEndReached=true
+        fi
 
         filename=$(echo "$imgURL"| sed "s/.*\///" )
         if grep -w "$filename" downloaded.txt >/dev/null
@@ -411,6 +416,10 @@ then
         printf "Download Wallpapers from Page %s\\n" "$page"
         downloadWallpapers
         printf "\\t- done!\\n"
+        if [ "$downloadEndReached" = true ]
+        then
+            break
+        fi
     done
 
 elif [ "$TYPE" == search ] || [ "$TYPE" == useruploads ]
@@ -436,6 +445,10 @@ then
         printf "Download Wallpapers from Page %s\\n" "$page"
         downloadWallpapers
         printf "\\t- done!\\n"
+        if [ "$downloadEndReached" = true ]
+        then
+            break
+        fi
     done
 
 elif [ "$TYPE" == favorites ]
@@ -483,6 +496,10 @@ then
         printf "Download Wallpapers from Page %s\\n" "$page"
         downloadWallpapers
         printf "\\t- done!\\n"
+        if [ "$downloadEndReached" = true ]
+        then
+            break
+        fi
     done
 
 else

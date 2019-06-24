@@ -1,5 +1,8 @@
 Changelog
  Revision 0.2.3
+ 1. added check to stop downloading when last page is reached
+ 
+ Revision 0.2.3
  1. fixed search function
  2. removed continue from wget, can cause problems with the downloaded json
 
