@@ -100,12 +100,19 @@ function checkDependencies {
     dependencies=(wget jq sed)
     [[ $PARALLEL == 1 ]] && dependencies+=(parallel)
 
-    for name in ${dependencies[@]}
+    for name in "${dependencies[@]}"
     do
-        [[ $(which $name 2>/dev/null) ]] ||
-        { printf "\n$name needs to be installed. Use your package manager to do so, e.g. 'sudo apt install $name'";deps=1; }
+        [[ $(command -v "$name" 2>/dev/null) ]] ||
+        { printf "\n%s needs to be installed. Use your package manager to do so, e.g. 'sudo apt install %s'" "$name" "$name";deps=1; }
     done
-    [[ $deps -ne 1 ]] && printf "OK\n" || { printf "\nInstall the above and rerun this script\n";exit 1; }
+
+    if [[ $deps -ne 1 ]]
+    then
+        printf "OK\n"
+    else
+        printf "\nInstall the above and rerun this script\n"
+        exit 1
+    fi
 } # /checkDependencies
 
 #
@@ -161,7 +168,7 @@ function getPage {
 # arg1: the file containing the wallpapers
 #
 function downloadWallpapers {
-    for ((i=0; i<$THUMBS; i++))
+    for ((i=0; i<THUMBS; i++))
     do
         imgURL=$(jq -r ".data[$i].path" tmp)
 
@@ -178,9 +185,8 @@ function downloadWallpapers {
         then
             echo "$imgURL" >> download.txt
         else
-            downloadWallpaper "$imgURL"
             # check if downloadWallpaper was successful
-            if [ $? == 0 ]
+            if downloadWallpaper "$imgURL"
             then
                 echo "$filename" >> downloaded.txt
             fi
