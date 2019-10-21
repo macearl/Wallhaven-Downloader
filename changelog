@@ -1,7 +1,10 @@
 Changelog
- Revision 0.2.3
+ Revision 0.2.5
+ 1. added support for new API endpoint User collections (also called favorites)
+
+ Revision 0.2.4
  1. added check to stop downloading when last page is reached
- 
+
  Revision 0.2.3
  1. fixed search function
  2. removed continue from wget, can cause problems with the downloaded json
