@@ -166,14 +166,14 @@ function getPage {
 # arg1: the file containing the wallpapers
 #
 function downloadWallpapers {
+    if (( "$page" >= "$(jq -r ".meta.last_page" tmp)" ))
+    then
+        downloadEndReached=true
+    fi
+
     for ((i=0; i<THUMBS; i++))
     do
         imgURL=$(jq -r ".data[$i].path" tmp)
-
-        if (( "$page" >= "$(jq -r ".meta.last_page" tmp)" ))
-        then
-            downloadEndReached=true
-        fi
 
         filename=$(echo "$imgURL"| sed "s/.*\///" )
         if grep -w "$filename" downloaded.txt >/dev/null
@@ -195,7 +195,7 @@ function downloadWallpapers {
     then
         # export wget wrapper and download function to make it
         # available for parallel
-        export -f WGET downloadWallpaper
+        export -f WGET coolDown downloadWallpaper
         SHELL=$(type -p bash) parallel --gnu --no-notice \
             'imgURL={} && downloadWallpaper $imgURL && echo "$imgURL"| sed "s/.*\///" >> downloaded.txt' < download.txt
             rm tmp download.txt
@@ -219,6 +219,15 @@ function downloadWallpaper {
 } # /downloadWallpaper
 
 #
+# Waits for 30 seconds if rate limiting is detected
+#
+function coolDown {
+    printf "\\t -Rate Limiting detected, sleeping for 30 seconds\\n"
+    sleep 30
+    WGET "$@"
+} # /coolDown
+
+#
 # wrapper for wget with some default arguments
 # arg0: additional arguments for wget (optional)
 # arg1: file to download
@@ -236,8 +245,11 @@ function WGET {
     fi
 
     # default wget command
-    wget -q --header="$httpHeader" --keep-session-cookies \
-         --save-cookies cookies.txt --load-cookies cookies.txt "$@"
+    wget --server-response -q --header="$httpHeader" --keep-session-cookies \
+         --save-cookies cookies.txt --load-cookies cookies.txt "$@" 2>&1 | \
+         grep "429 Too Many Requests" >/dev/null && coolDown "$@"
+
+    return "${PIPESTATUS[0]}"
 } # /WGET
 
 #

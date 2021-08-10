@@ -1,4 +1,7 @@
 Changelog
+ Revision 0.2.6
+ 1. added check for rate limiting
+
  Revision 0.2.5
  1. added support for new API endpoint User collections (also called favorites)
 
