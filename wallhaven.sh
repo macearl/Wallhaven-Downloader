@@ -6,7 +6,7 @@
 #
 # This Script is written for GNU Linux, it should work under Mac OS
 
-REVISION=0.2.5
+REVISION=0.2.6
 
 #####################################
 ###   Needed for NSFW/Favorites   ###
@@ -196,6 +196,7 @@ function downloadWallpapers {
         # export wget wrapper and download function to make it
         # available for parallel
         export -f WGET coolDown downloadWallpaper
+        # shellcheck disable=SC2016
         SHELL=$(type -p bash) parallel --gnu --no-notice \
             'imgURL={} && downloadWallpaper $imgURL && echo "$imgURL"| sed "s/.*\///" >> downloaded.txt' < download.txt
             rm tmp download.txt
@@ -353,9 +354,6 @@ while [[ $# -ge 1 ]]
             shift;;
         -o|--order)
             ORDER="$2"
-            shift;;
-        -b|--favcollection)
-            FAVCOLLECTION="$2"
             shift;;
         -q|--query)
             QUERY=${2//\'/}
@@ -518,3 +516,4 @@ else
 fi
 
 rm -f cookies.txt
+
